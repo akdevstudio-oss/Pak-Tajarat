@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F9D58" />
+      <stop offset="100%" stop-color="#0B1B3D" />
+    </linearGradient>
+  </defs>
+  <!-- Beautiful Hexagonal/Star Shape -->
+  <path d="M50 5 L88 27 L88 73 L50 95 L12 73 L12 27 Z" fill="url(#logo-grad)" />
+  <!-- Inner P and T monogram style in White -->
+  <text x="50" y="65" font-family="system-ui, sans-serif" font-size="45" font-weight="900" fill="#FFFFFF" text-anchor="middle">PT</text>
+</svg>

@@ -1,0 +1,27 @@
+# robots.txt for Pak-Tajarat - Pakistan's Premium E-Commerce & Affiliate Platform
+# For search engines and AI crawlers indexing setup
+
+User-agent: *
+Allow: /
+Disallow: /admin-dashboard
+Disallow: /profile
+Disallow: /checkout
+Disallow: /cart
+
+# Specifically allow AI models (ChatGPT, Gemini, etc.) to index product directory
+User-agent: GPTBot
+Allow: /
+Allow: /products
+Disallow: /admin-dashboard
+Disallow: /profile
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /products
+
+User-agent: Google-Extended
+Allow: /
+Allow: /products
+
+# Declare sitemap location
+Sitemap: https://pak-tajarat.store/sitemap.xml

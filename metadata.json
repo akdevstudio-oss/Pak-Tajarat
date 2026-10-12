@@ -1,0 +1,6 @@
+{
+  "name": "Pak-Tajarat",
+  "description": "Pakistan's premium and trusted online e-commerce shopping platform, offering electronics, fashion, home decor, beauty, and more.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

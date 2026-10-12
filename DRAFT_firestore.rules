@@ -1,0 +1,293 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Global Default-Deny Catch-All Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reusable, hardened global helper primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && (
+        request.auth.token.email_verified == true || 
+        request.auth.token.firebase.sign_in_provider == 'google.com'
+      );
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == "admin@paktajarat.pk" || 
+        request.auth.token.email == "akdevstudiosolutions@gmail.com" || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "Admin")
+      );
+    }
+
+    function userMatchesEmail(email) {
+      return isSignedIn() && (
+        request.auth.token.email == email || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.email == email)
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 2. Entity Validation Functions
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'email', 'fullName', 'role']) &&
+             data.keys().size() >= 4 &&
+             data.email is string && data.email.size() <= 200 &&
+             data.fullName is string && data.fullName.size() <= 200 &&
+             data.role is string && (data.role == 'User' || data.role == 'Admin');
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['id', 'name', 'price', 'image', 'category', 'stock']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() <= 200 &&
+             data.price is number && data.price >= 0 &&
+             data.image is string && data.image.size() <= 1000 &&
+             data.category is string && data.category.size() <= 100 &&
+             data.stock is number && data.stock >= 0 &&
+             (data.get('affiliateEnabled', null) == null || data.affiliateEnabled is bool) &&
+             (data.get('commissionType', null) == null || data.commissionType is string) &&
+             (data.get('commissionValue', null) == null || data.commissionValue is number);
+    }
+
+    // ORDERS COLLECTION
+    function isValidOrder(data) {
+      return data.keys().hasAll(['id', 'userId', 'items', 'subtotal', 'shipping', 'discount', 'total', 'status', 'paymentMethod', 'shippingAddress', 'date']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.items is list && data.items.size() > 0 &&
+             data.subtotal is number && data.subtotal >= 0 &&
+             data.shipping is number && data.shipping >= 0 &&
+             data.discount is number && data.discount >= 0 &&
+             data.total is number && data.total >= 0 &&
+             data.status is string && (data.status == 'Pending' || data.status == 'Processing' || data.status == 'Shipped' || data.status == 'Delivered' || data.status == 'Cancelled') &&
+             data.paymentMethod is string &&
+             data.shippingAddress is map &&
+             data.date is string &&
+             (data.get('affiliateId', null) == null || data.affiliateId is string) &&
+             (data.get('referralCommissionEarned', null) == null || data.referralCommissionEarned is number);
+    }
+
+    function isValidReview(data) {
+      return data.keys().hasAll(['id', 'productId', 'userName', 'userEmail', 'rating', 'comment', 'date']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.productId is string && data.productId.size() <= 128 &&
+             data.userName is string && data.userName.size() <= 200 &&
+             data.userEmail is string && data.userEmail.size() <= 200 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() <= 2000 &&
+             data.date is string;
+    }
+
+    // AFFILIATE SYSTEM ENTITY
+    function isValidAffiliate(data) {
+      return data.keys().hasAll(['id', 'userId', 'referralCode', 'totalClicks', 'totalReferrals', 'totalEarnings', 'pendingCommission', 'paidCommission', 'status']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.referralCode is string && data.referralCode.size() <= 50 &&
+             data.totalClicks is number && data.totalClicks >= 0 &&
+             data.totalReferrals is number && data.totalReferrals >= 0 &&
+             data.totalEarnings is number && data.totalEarnings >= 0 &&
+             data.pendingCommission is number && data.pendingCommission >= 0 &&
+             data.paidCommission is number && data.paidCommission >= 0 &&
+             data.status is string && (data.status == 'active' || data.status == 'inactive' || data.status == 'pending_approval' || data.status == 'rejected') &&
+             (data.get('paymentMethod', null) == null || data.paymentMethod is string) &&
+             (data.get('paymentDetails', null) == null || data.paymentDetails is string) &&
+             (data.get('rejectionReason', null) == null || data.rejectionReason is string) &&
+             (data.get('isTopSeller', null) == null || data.isTopSeller is bool) &&
+             (data.get('createdAt', null) == null || data.createdAt is string);
+    }
+
+    function isValidReferral(data) {
+      return data.keys().hasAll(['id', 'affiliateId', 'status', 'date', 'type']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.affiliateId is string && data.affiliateId.size() <= 128 &&
+             data.status is string &&
+             data.date is string &&
+             data.type is string && (data.type == 'click' || data.type == 'conversion') &&
+             (data.get('referredUserId', null) == null || data.referredUserId is string) &&
+             (data.get('orderId', null) == null || data.orderId is string) &&
+             (data.get('purchaseAmount', null) == null || data.purchaseAmount is number) &&
+             (data.get('commissionAmount', null) == null || data.commissionAmount is number);
+    }
+
+    function isValidWithdrawal(data) {
+      return data.keys().hasAll(['id', 'affiliateId', 'amount', 'paymentMethod', 'paymentDetails', 'status', 'date']) &&
+             data.id is string && data.id.size() <= 128 &&
+             data.affiliateId is string && data.affiliateId.size() <= 128 &&
+             data.amount is number && data.amount > 0 &&
+             data.paymentMethod is string &&
+             data.paymentDetails is string &&
+             data.status is string && (data.status == 'pending' || data.status == 'approved' || data.status == 'rejected') &&
+             data.date is string;
+    }
+
+    function isValidCoupon(data) {
+      return data.keys().hasAll(['code', 'discountType', 'discountValue']) &&
+             data.code is string && data.code.size() <= 100 &&
+             data.discountType is string && (data.discountType == 'percentage' || data.discountType == 'fixed') &&
+             data.discountValue is number && data.discountValue >= 0 &&
+             (data.get('minSpend', null) == null || data.minSpend is number) &&
+             (data.get('isReward', null) == null || data.isReward is bool) &&
+             (data.get('assignedTo', null) == null || data.assignedTo is string) &&
+             (data.get('eligibility', null) == null || data.eligibility is string);
+    }
+
+    // 3. Document Path Rules Matching Schema Collections
+
+    // USERS COLLECTION
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId && incoming().id == userId && isValidUser(incoming());
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && incoming().id == userId && isValidUser(incoming()) && (
+        // Protect role field from self-escalation
+        incoming().role == existing().role || isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // PRODUCTS COLLECTION
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidProduct(incoming());
+      allow update: if isAdmin() && isValidProduct(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // ORDERS COLLECTION
+    match /orders/{orderId} {
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid && isValidOrder(incoming());
+      allow update: if (
+        isAdmin() && isValidOrder(incoming())
+      ) || (
+        // Customer Cancelling their own Order Action
+        isSignedIn() && 
+        existing().userId == request.auth.uid && 
+        incoming().diff(existing()).affectedKeys().hasOnly(['status']) &&
+        incoming().status == 'Cancelled' && 
+        existing().status == 'Pending'
+      );
+      allow delete: if isAdmin();
+    }
+
+    // REVIEWS COLLECTION
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (userMatchesEmail(incoming().userEmail) || isAdmin()) && isValidReview(incoming());
+      allow update: if isSignedIn() && (userMatchesEmail(existing().userEmail) || isAdmin()) && (userMatchesEmail(incoming().userEmail) || isAdmin()) && isValidReview(incoming());
+      allow delete: if isSignedIn() && (userMatchesEmail(resource.data.userEmail) || isAdmin());
+    }
+
+    // AFFILIATES COLLECTION
+    match /affiliates/{affiliateId} {
+      allow get: if resource.data.status == 'active' || (isSignedIn() && (request.auth.uid == affiliateId || isAdmin()));
+      allow list: if isAdmin() || (resource.data.status == 'active');
+      
+      // On creation, must default to pending_approval, zero balances, and correct userId
+      allow create: if isSignedIn() && 
+                    request.auth.uid == affiliateId && 
+                    incoming().id == affiliateId &&
+                    incoming().userId == affiliateId &&
+                    isValidAffiliate(incoming()) && 
+                    incoming().status == 'pending_approval' && 
+                    incoming().totalClicks == 0 && 
+                    incoming().totalReferrals == 0 && 
+                    incoming().totalEarnings == 0 && 
+                    incoming().pendingCommission == 0 && 
+                    incoming().paidCommission == 0;
+      
+      // On update:
+      // 1. Admin can update everything
+      // 2. Affiliate can update their payment options OR re-apply if rejected
+      // 3. Anyone can increment click counter on active affiliates
+      allow update: if (
+        isAdmin() && isValidAffiliate(incoming())
+      ) || (
+        isSignedIn() && 
+        request.auth.uid == affiliateId && 
+        isValidAffiliate(incoming()) && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['paymentMethod', 'paymentDetails']) ||
+          // Allow re-applying when rejected:
+          (
+            existing().status == 'rejected' &&
+            incoming().status == 'pending_approval' &&
+            incoming().totalClicks == 0 &&
+            incoming().totalReferrals == 0 &&
+            incoming().totalEarnings == 0 &&
+            incoming().pendingCommission == 0 &&
+            incoming().paidCommission == 0
+          )
+        )
+      ) || (
+        existing().status == 'active' &&
+        isValidAffiliate(incoming()) &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['totalClicks']) &&
+        incoming().totalClicks == existing().totalClicks + 1
+      );
+      allow delete: if isAdmin();
+    }
+
+    // REFERRALS COLLECTION
+    match /referrals/{referralId} {
+      allow get: if isSignedIn() && (resource.data.affiliateId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.affiliateId == request.auth.uid || isAdmin());
+      // Anyone can create a referral click, conversion requires system/admin confirmation
+      allow create: if isValidReferral(incoming()) && (
+        incoming().type == 'click' || isAdmin()
+      );
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // WITHDRAWALS COLLECTION
+    match /withdrawals/{withdrawalId} {
+      allow get: if isSignedIn() && (resource.data.affiliateId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.affiliateId == request.auth.uid || isAdmin());
+      // Payout request can be submitted by verified affiliate, starting with pending state
+      allow create: if isSignedIn() && 
+                    incoming().affiliateId == request.auth.uid && 
+                    isValidWithdrawal(incoming()) && 
+                    incoming().status == 'pending';
+      allow update: if isAdmin() && isValidWithdrawal(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // SYSTEM CONFIG
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // COUPONS COLLECTION
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidCoupon(incoming());
+      allow update: if isAdmin() && isValidCoupon(incoming());
+      allow delete: if isAdmin();
+    }
+
+  }
+}
