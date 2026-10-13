@@ -387,9 +387,36 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setCurrentViewState(view);
   }, []);
 
+  // Open a product and update the URL so each product can be shared/bookmarked.
   const viewProductDetails = useCallback((productId: string) => {
     setSelectedProductId(productId);
     setCurrentViewState('details');
+
+    const productPath = `/products/${encodeURIComponent(productId)}`;
+    if (typeof window !== 'undefined' && window.location.pathname !== productPath) {
+      window.history.pushState({ productId }, '', productPath);
+    }
+  }, []);
+
+  // Keep the selected view/product in sync with browser Back and Forward.
+  useEffect(() => {
+    const syncRouteFromUrl = () => {
+      const path = window.location.pathname.replace(/\\/+$/, '') || '/';
+      const match = path.match(/^\\/(?:products|product)\\/([^/]+)$/i);
+
+      if (match) {
+        let productId = match[1];
+        try { productId = decodeURIComponent(productId); } catch { /* use original path segment */ }
+        setSelectedProductId(productId);
+        setCurrentViewState('details');
+      } else if (path.toLowerCase() === '/products' || path.toLowerCase() === '/shop') {
+        setSelectedProductId(null);
+        setCurrentViewState('products');
+      }
+    };
+
+    window.addEventListener('popstate', syncRouteFromUrl);
+    return () => window.removeEventListener('popstate', syncRouteFromUrl);
   }, []);
 
   // CMS updaters
