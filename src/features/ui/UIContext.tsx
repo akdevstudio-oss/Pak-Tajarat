@@ -401,11 +401,14 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   // Keep the selected view/product in sync with browser Back and Forward.
   useEffect(() => {
     const syncRouteFromUrl = () => {
-      const path = window.location.pathname.replace(/\\/+$/, '') || '/';
-      const match = path.match(/^\\/(?:products|product)\\/([^/]+)$/i);
+      let path = window.location.pathname || '/';
+      while (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+      const segments = path.split('/').filter(Boolean);
+      const isProductPath = segments.length === 2 && (segments[0].toLowerCase() === 'products' || segments[0].toLowerCase() === 'product');
+      const productIdFromPath = isProductPath ? segments[1] : null;
 
-      if (match) {
-        let productId = match[1];
+      if (productIdFromPath) {
+        let productId = productIdFromPath;
         try { productId = decodeURIComponent(productId); } catch { /* use original path segment */ }
         setSelectedProductId(productId);
         setCurrentViewState('details');
