@@ -2,7 +2,7 @@ import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
-import { Product, Order, CATEGORIES, BlogPost, Coupon, Review, Affiliate } from '../types';
+import { Product, Order, CATEGORIES, BlogPost, Coupon, Review, Affiliate } from '../shared/types';
 import { generateSitemapXML, generateGoogleMerchantFeedXML } from '../utils/seo';
 import { Logo } from '../components/Logo';
 import { WebsiteBrandingManager } from '../components/admin/WebsiteBrandingManager';
