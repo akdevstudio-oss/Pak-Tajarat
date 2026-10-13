@@ -60,57 +60,122 @@ export const ProductDetailsView: React.FC = () => {
     }
   }, [product?.id]);
 
-  // Dynamically update document head tags for fast SEO ranking
+  // Keep product metadata and structured data aligned with the product currently shown.
   useEffect(() => {
-    if (!product) return;
+    if (!product || typeof window === 'undefined') return;
 
-    // 1. Title Tag
-    const originalTitle = document.title;
-    if (product.seoTitle) {
-      document.title = product.seoTitle;
-    } else {
-      document.title = `${product.name} | Pak-Tajarat Online Shop`;
-    }
+    const siteUrl = 'https://pak-tajarat.store';
+    const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    const pathSegments = path.split('/').filter(Boolean);
+    const isProductPath = (pathSegments[0] === 'product' || pathSegments[0] === 'products') && pathSegments.length === 2;
+    const canonicalPath = isProductPath ? path : `/products/${encodeURIComponent(product.id)}`;
+    const canonicalUrl = `${siteUrl}${canonicalPath}`;
+    const title = (product.seoTitle || `${product.name} | Pak-Tijarat`).slice(0, 70);
+    const description = (product.seoDescription || product.description || `Shop ${product.name} at Pak-Tijarat.`)
+      .split(' ')
+      .filter(Boolean)
+      .join(' ')
+      .trim()
+      .slice(0, 160);
+    const imageUrl = product.image
+      ? (product.image.startsWith('http') ? product.image : `${siteUrl}${product.image.startsWith('/') ? '' : '/'}${product.image}`)
+      : `${siteUrl}/android-chrome-512x512.png`;
 
-    // 2. Meta Description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    const originalDesc = metaDesc ? metaDesc.getAttribute('content') : '';
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.setAttribute('name', 'description');
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute('content', product.seoDescription || product.description);
-
-    // 3. Meta Keywords
-    let metaKeywords = document.querySelector('meta[name="keywords"]');
-    const originalKeywords = metaKeywords ? metaKeywords.getAttribute('content') : '';
-    if (!metaKeywords) {
-      metaKeywords = document.createElement('meta');
-      metaKeywords.setAttribute('name', 'keywords');
-      document.head.appendChild(metaKeywords);
-    }
-    metaKeywords.setAttribute('content', product.seoKeywords || `${(product?.name || '').toLowerCase()}, online shopping pakistan`);
-
-    // Clean up on unmount
-    return () => {
-      document.title = originalTitle;
-      if (metaDesc) {
-        if (originalDesc) {
-          metaDesc.setAttribute('content', originalDesc);
-        } else {
-          metaDesc.remove();
-        }
+    const restore: Array<() => void> = [];
+    const setMeta = (selector: string, attribute: string, value: string) => {
+      let element = document.head.querySelector(selector) as HTMLMetaElement | null;
+      const existed = Boolean(element);
+      if (!element) {
+        element = document.createElement('meta');
+        const key = selector.slice(selector.indexOf('"') + 1, selector.lastIndexOf('"'));
+        element.setAttribute(selector.startsWith('meta[property=') ? 'property' : 'name', key);
+        document.head.appendChild(element);
       }
-      if (metaKeywords) {
-        if (originalKeywords) {
-          metaKeywords.setAttribute('content', originalKeywords);
-        } else {
-          metaKeywords.remove();
-        }
+      const oldValue = element.getAttribute(attribute);
+      element.setAttribute(attribute, value);
+      restore.push(() => {
+        if (!element) return;
+        if (existed && oldValue !== null) element.setAttribute(attribute, oldValue);
+        else element.remove();
+      });
+    };
+
+    const canonical = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    const oldCanonical = canonical?.href || null;
+    let canonicalLink = canonical;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = 'canonical';
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.href = canonicalUrl;
+    restore.push(() => {
+      if (!canonicalLink) return;
+      if (oldCanonical) canonicalLink.href = oldCanonical;
+      else canonicalLink.remove();
+    });
+
+    const oldTitle = document.title;
+    document.title = title;
+    restore.push(() => { document.title = oldTitle; });
+    setMeta('meta[name="description"]', 'content', description);
+    setMeta('meta[property="og:type"]', 'content', 'product');
+    setMeta('meta[property="og:title"]', 'content', title);
+    setMeta('meta[property="og:description"]', 'content', description);
+    setMeta('meta[property="og:url"]', 'content', canonicalUrl);
+    setMeta('meta[property="og:image"]', 'content', imageUrl);
+    setMeta('meta[name="twitter:card"]', 'content', 'summary_large_image');
+    setMeta('meta[name="twitter:title"]', 'content', title);
+    setMeta('meta[name="twitter:description"]', 'content', description);
+    setMeta('meta[name="twitter:image"]', 'content', imageUrl);
+
+    const productReviewsForSchema = reviews.filter(review => review.productId === product.id);
+    const ratings = productReviewsForSchema.map(review => Number(review.rating)).filter(rating => Number.isFinite(rating) && rating >= 1 && rating <= 5);
+    const productSchema: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.name,
+      description,
+      image: product.images?.length ? product.images : [imageUrl],
+      url: canonicalUrl,
+      category: product.category,
+      offers: {
+        '@type': 'Offer',
+        url: canonicalUrl,
+        priceCurrency: 'PKR',
+        price: Number(product.price).toFixed(2),
+        availability: Number(product.stock) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        itemCondition: 'https://schema.org/NewCondition',
+        seller: { '@type': 'Organization', name: 'Pak-Tijarat', url: siteUrl }
       }
     };
-  }, [product]);
+    if (ratings.length > 0) {
+      productSchema.aggregateRating = {
+        '@type': 'AggregateRating',
+        ratingValue: (ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length).toFixed(1),
+        reviewCount: ratings.length,
+        bestRating: 5,
+        worstRating: 1
+      };
+    }
+    let schemaScript = document.getElementById('pak-tajarat-product-schema') as HTMLScriptElement | null;
+    const hadSchema = Boolean(schemaScript);
+    const oldSchema = schemaScript?.textContent || '';
+    if (!schemaScript) {
+      schemaScript = document.createElement('script');
+      schemaScript.id = 'pak-tajarat-product-schema';
+      schemaScript.type = 'application/ld+json';
+      document.head.appendChild(schemaScript);
+    }
+    schemaScript.textContent = JSON.stringify(productSchema);
+    restore.push(() => {
+      if (!schemaScript) return;
+      if (hadSchema) schemaScript.textContent = oldSchema;
+      else schemaScript.remove();
+    });
+
+    return () => restore.reverse().forEach(cleanup => cleanup());
+  }, [product, reviews]);
 
   if (!product) {
     return (

@@ -1,66 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Main Home Page -->
-  <url>
-    <loc>https://pak-tajarat.store/</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  
-  <!-- Products Directory -->
-  <url>
-    <loc>https://pak-tajarat.store/products</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Affiliate Portal & Authentication -->
-  <url>
-    <loc>https://pak-tajarat.store/auth</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- About Us -->
-  <url>
-    <loc>https://pak-tajarat.store/about</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Contact Us -->
-  <url>
-    <loc>https://pak-tajarat.store/contact</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Privacy Policy -->
-  <url>
-    <loc>https://pak-tajarat.store/privacy</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <!-- Terms and Conditions -->
-  <url>
-    <loc>https://pak-tajarat.store/terms</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <!-- Refund Policy -->
-  <url>
-    <loc>https://pak-tajarat.store/refund</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
+  <url><loc>https://pak-tajarat.store/</loc></url>
+  <url><loc>https://pak-tajarat.store/products</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p1</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p3</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p4</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p2</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p5</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p6</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p7</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p8</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p9</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p10</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p11</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p12</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p13</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p14</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p15</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p16</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p17</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p18</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p19</loc></url>
+  <url><loc>https://pak-tajarat.store/products/p20</loc></url>
+  <url><loc>https://pak-tajarat.store/about</loc></url>
+  <url><loc>https://pak-tajarat.store/contact</loc></url>
+  <url><loc>https://pak-tajarat.store/blog</loc></url>
+  <url><loc>https://pak-tajarat.store/faq</loc></url>
+  <url><loc>https://pak-tajarat.store/privacy</loc></url>
+  <url><loc>https://pak-tajarat.store/terms</loc></url>
+  <url><loc>https://pak-tajarat.store/refund</loc></url>
 </urlset>
