@@ -8,46 +8,81 @@
   --font-display: "Space Grotesk", sans-serif;
 }
 
-/* Custom smooth scrolling and custom minimalist green scrollbar for premium aesthetics */
+:root {
+  color-scheme: light;
+  --pt-green: #176b45;
+  --pt-green-hover: #105638;
+  --pt-green-soft: #eaf5ee;
+  --pt-ink: #17221b;
+  --pt-muted: #647168;
+  --pt-border: #e3eae5;
+  --pt-radius-card: 1.25rem;
+}
+
+/* Smooth scrolling and brand scrollbar */
 html {
   scroll-behavior: smooth;
-  background-color: #f8fafc; /* Default light background (slate-50) */
-  color: #0f172a; /* Default light text (slate-900) */
+  background-color: #f8fafc;
+  color: #0f172a;
 }
-
 html.dark {
-  background-color: #09090b; /* Default dark background (zinc-950) */
-  color: #f4f4f5; /* Default dark text (zinc-100) */
+  color-scheme: dark;
+  background-color: #09090b;
+  color: #f4f4f5;
+}
+body { background-color: transparent; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--pt-green); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--pt-green-hover); }
+
+.hover-scale { transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+.hover-scale:hover { transform: scale(1.02); }
+
+/* Pak-Tijarat visual alignment: subtle surfaces, consistent focus, no layout rewrites. */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #77bd93;
+  outline-offset: 3px;
+}
+button, a { -webkit-tap-highlight-color: transparent; }
+img { max-width: 100%; }
+#home-view-container { color: var(--pt-ink); }
+#hero-slider img { display: block; }
+#hero-slider button,
+#categories-grid button,
+#home-view-container button { touch-action: manipulation; }
+#usp-badges > div {
+  border-color: var(--pt-border);
+  box-shadow: 0 2px 10px rgb(20 65 42 / 3%);
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+#usp-badges > div:hover {
+  border-color: #b9d9c4;
+  box-shadow: 0 8px 24px rgb(20 65 42 / 7%);
+}
+[id^="prod-card-"] {
+  border-color: var(--pt-border);
+  border-radius: var(--pt-radius-card);
+}
+#main-header { border-color: var(--pt-border); }
+#main-header input { min-width: 0; }
+#home-view-container h2,
+#home-view-container h3 { text-wrap: pretty; }
+
+/* Motion should never be required to understand or use the store. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-body {
-  background-color: transparent;
-}
-
-/* Custom Scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #0F9D58;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #0B7B44;
-}
-
-/* Utility layout transition effects */
-.hover-scale {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.hover-scale:hover {
-  transform: scale(1.02);
+/* Avoid tight layouts on very narrow phones. */
+@media (max-width: 360px) {
+  #home-view-container { overflow-wrap: anywhere; }
+  #hero-slider h1 { font-size: 1.8rem; }
 }
