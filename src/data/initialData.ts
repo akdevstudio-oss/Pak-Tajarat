@@ -66,10 +66,10 @@ export const DEFAULT_HERO_BANNERS: HeroBanner[] = [
 export const INITIAL_PRODUCTS: Product[] = [
   {
     id: 'p2',
-    name: 'Flexible Hard Shell Laptop Backpack | Made in Pakistan',
+    name: 'Premium Flexible Hard Shell Laptop Backpack | Waterproof Business & Travel Backpack | Made in Pakistan',
     description: 'Experience premium protection and modern style with our Flexible Hard Shell Laptop Backpack, proudly manufactured in Pakistan. Engineered using a high-performance polymer blend of PP Homopolymer, HDPE, LLDPE, Elastomer, and ABS for impact resistance and ergonomic daily carry.',
-    price: 4850,
-    originalPrice: 7500,
+    price: 3200,
+    originalPrice: undefined,
     image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
@@ -77,8 +77,8 @@ export const INITIAL_PRODUCTS: Product[] = [
       'https://images.unsplash.com/photo-1546938576-6e6a64f317cc?auto=format&fit=crop&w=800&q=80'
     ],
     category: 'Fashion',
-    rating: 4.9,
-    reviewsCount: 89,
+    rating: 0,
+    reviewsCount: 0,
     stock: 40,
     specifications: {
       'Material': 'Polymer Blend (PP Homo, HDPE, LLDPE, Elastomer, ABS)',
@@ -93,9 +93,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     affiliateEnabled: true,
     commissionType: 'percentage',
     commissionValue: 15,
-    seoTitle: 'Flexible Hard Shell Laptop Backpack | Made in Pakistan',
-    seoDescription: 'Export-grade flexible hard shell laptop backpack made in Pakistan with polymer armor and ergonomic straps.',
-    seoKeywords: 'laptop backpack pakistan, hard shell bag, waterproof backpack'
+    seoTitle: 'Premium Hard Shell Laptop Backpack | Made in Pakistan',
+    seoDescription: 'Shop a premium flexible hard shell laptop backpack made in Pakistan for business, study and travel. Price Rs. 3,200. Check availability and delivery details at Pak-Tijarat.',
+    seoKeywords: 'laptop backpack Pakistan, hard shell laptop backpack, business travel backpack, waterproof backpack Pakistan, Made in Pakistan'
   }
 ];
 
@@ -116,26 +116,7 @@ export const INITIAL_COUPONS: Coupon[] = [
   }
 ];
 
-export const INITIAL_REVIEWS = [
-  {
-    id: 'r1',
-    productId: 'p1',
-    userName: 'Muhammad Ali',
-    userEmail: 'ali@example.com',
-    rating: 5,
-    comment: 'Excellent watch! Screen quality is amazing and battery lasts almost 9 days. Highly recommended!',
-    date: '2026-07-20'
-  },
-  {
-    id: 'r2',
-    productId: 'p2',
-    userName: 'Usman Tariq',
-    userEmail: 'usman@example.com',
-    rating: 5,
-    comment: 'The quality of the polymer hard shell is unmatched. Very comfortable for daily commuting.',
-    date: '2026-07-22'
-  }
-];
+export const INITIAL_REVIEWS = [];
 
 export const INITIAL_BLOGS: BlogPost[] = [
   {
