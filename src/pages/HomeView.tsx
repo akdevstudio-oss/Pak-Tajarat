@@ -26,27 +26,24 @@ export const HomeView: React.FC = () => {
   const newArrivals = activeProducts.filter(p => p.isNewArrival).slice(0, 4);
   const flashSaleProducts = activeProducts.filter(p => p.isFlashSale).slice(0, 3);
 
-  // Force clean default banners (temporary fix for faded hero)
-  const banners = [
-    {
-      id: 'b1',
-      title: "Welcome to Pak-Tajarat",
-      subtitle: "Pakistan's Trusted Online Shopping Platform",
-      description: "Discover verified electronics, local embroidered fashion, premium kitchenware, and direct-from-farm grocery.",
-      gradient: "from-emerald-800 to-teal-950",
-      image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80",
-      badge: "Summer Mega Launch"
-    },
-    {
-      id: 'b2',
-      title: "Handcrafted Sialkot Gear",
-      subtitle: "Premium Professional Quality Guaranteed",
-      description: "Equip your match with standard Grade-A Sialkot Willow cricket bats, protective accessories, and durable tap-ball kits.",
-      gradient: "from-zinc-800 to-zinc-950",
-      image: "https://images.unsplash.com/photo-1531415080290-bc9854593f37?auto=format&fit=crop&w=800&q=80",
-      badge: "Sialkot Sports Pride"
-    }
-  ];
+  // Show the real catalog product instead of promotional/demo products.
+  const banners = activeProducts.length > 0 ? [{
+    id: 'real-product',
+    title: activeProducts[0].name,
+    subtitle: "Available from Pak-Tijarat",
+    description: activeProducts[0].description,
+    gradient: "from-emerald-800 to-teal-950",
+    image: activeProducts[0].image,
+    badge: "CURRENT PRODUCT"
+  }] : [{
+    id: 'empty-catalog',
+    title: "Pak-Tijarat",
+    subtitle: "Pakistan's Trusted Digital Marketplace",
+    description: "Our next products will be added by the store admin.",
+    gradient: "from-emerald-800 to-teal-950",
+    image: "",
+    badge: "COMING SOON"
+  }];
 
   const [activeBanner, setActiveBanner] = useState(0);
 
@@ -76,29 +73,7 @@ export const HomeView: React.FC = () => {
   };
 
   // Static Reviews for Pak-Tajarat
-  const customerReviews = [
-    {
-      name: "Zeeshan Haider",
-      city: "Karachi",
-      text: "The delivery took only 3 days to Karachi, and the product was authentic. Highly impressed with Pak-Tajarat's support team when choosing my size!",
-      rating: 5,
-      avatar: "ZH"
-    },
-    {
-      name: "Sana Malik",
-      city: "Lahore",
-      text: "Bought the dinner ceramic set and was afraid it would break during transport. It arrived in double wooden crates, absolutely secure! 100% recommended.",
-      rating: 5,
-      avatar: "SM"
-    },
-    {
-      name: "Dr. Farooq",
-      city: "Islamabad",
-      text: "Outstanding customer service and direct delivery. Finally a reliable, high-end platform in Pakistan that doesn't ship fake duplicates. Very happy.",
-      rating: 5,
-      avatar: "DF"
-    }
-  ];
+  const customerReviews: { name: string; city: string; text: string; rating: number; avatar: string }[] = [];
 
   return (
     <div className="w-full space-y-12 sm:space-y-16 pb-16 animate-in fade-in duration-300" id="home-view-container">
@@ -229,7 +204,7 @@ export const HomeView: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-4">
-          {CATEGORIES.map((cat, idx) => (
+          {Array.from(new Set(activeProducts.map(p => p.category))).map((cat, idx) => (
             <button
               key={`${cat}-${idx}`}
               onClick={() => setCurrentView('products')}
@@ -330,7 +305,7 @@ export const HomeView: React.FC = () => {
       </section>
 
       {/* 6. Dynamic Promotional Banner */}
-      <section className="relative w-full overflow-hidden rounded-3xl" id="promo-callout">
+      {activeProducts.length > 1 && <section className="relative w-full overflow-hidden rounded-3xl" id="promo-callout">
         <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white p-8 md:p-12 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0 relative">
           <div className="space-y-3 max-w-xl text-left">
             <span className="bg-yellow-500 text-gray-900 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded">
@@ -351,10 +326,10 @@ export const HomeView: React.FC = () => {
             <ArrowRight size={16} />
           </button>
         </div>
-      </section>
+      </section>}
 
       {/* 7. New Arrivals & Best Sellers split tabs */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8" id="arrivals-bestsellers-split">
+      {activeProducts.length > 1 && <section className="grid grid-cols-1 lg:grid-cols-2 gap-8" id="arrivals-bestsellers-split">
         
         {/* Best Sellers Column */}
         <div className="space-y-6">
@@ -386,10 +361,10 @@ export const HomeView: React.FC = () => {
           </div>
         </div>
 
-      </section>
+      </section>}
 
       {/* 8. Verified Reviews Section */}
-      <section className="space-y-6" id="customer-reviews">
+      {customerReviews.length > 0 && <section className="space-y-6" id="customer-reviews">
         <div className="text-center max-w-lg mx-auto">
           <span className="text-xs font-black uppercase text-[#0F9D58] tracking-widest leading-none">Pakistan-Wide Feedback</span>
           <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight mt-1">
@@ -432,7 +407,7 @@ export const HomeView: React.FC = () => {
             </div>
           ))}
         </div>
-      </section>
+      </section>}
 
       {/* 9. Latest Educational Insights & Sourcing Guides Section */}
       {blogs && blogs.length > 0 && (
