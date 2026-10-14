@@ -30,6 +30,8 @@ export interface ProductsContextType {
   addToRecentlyViewed: (productId: string) => void;
 }
 
+const DEMO_PRODUCT_IDS = new Set(['p1', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p17', 'p18', 'p19', 'p20']);
+
 const ProductsContext = createContext<ProductsContextType | undefined>(undefined);
 
 export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -41,7 +43,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const saved = localStorage.getItem('pak_tajarat_local_products');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter((p: Product) => !DEMO_PRODUCT_IDS.has(p.id));
       }
     } catch (_) {}
     return INITIAL_PRODUCTS;
@@ -103,13 +105,13 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const unsubscribeProducts = onSnapshot(collection(db, 'products'), (snapshot) => {
       const items: Product[] = [];
       snapshot.forEach((docSnap) => {
-        items.push({ id: docSnap.id, ...docSnap.data() } as Product);
+        if (!DEMO_PRODUCT_IDS.has(docSnap.id)) items.push({ id: docSnap.id, ...docSnap.data() } as Product);
       });
 
       const savedLocal = localStorage.getItem('pak_tajarat_local_products');
       let localProds: Product[] = [];
       if (savedLocal) {
-        try { localProds = JSON.parse(savedLocal); } catch (_) {}
+        try { localProds = JSON.parse(savedLocal).filter((p: Product) => !DEMO_PRODUCT_IDS.has(p.id)); } catch (_) {}
       }
 
       const deletedIds = new Set(getDeletedIds());
@@ -163,7 +165,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         try {
           const parsed = JSON.parse(savedLocal);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setProducts(parsed.filter((p: Product) => !deletedIds.has(p.id)));
+            setProducts(parsed.filter((p: Product) => !deletedIds.has(p.id) && !DEMO_PRODUCT_IDS.has(p.id)));
             return;
           }
         } catch (_) {}
