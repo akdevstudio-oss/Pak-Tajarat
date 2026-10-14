@@ -512,7 +512,7 @@ export const Header: React.FC = () => {
               {/* Notifications Popover */}
               {showNotifications && (
                 <div 
-                  className="absolute -right-8 sm:right-0 mt-3 w-72 sm:w-80 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-xl z-50 overflow-hidden"
+                  className="absolute right-0 mt-3 w-[min(20rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] max-h-[min(70vh,32rem)] bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-xl z-[60] overflow-hidden flex flex-col"
                   onMouseLeave={() => setShowNotifications(false)}
                 >
                   <div className="p-4 bg-gray-50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center">
@@ -526,7 +526,7 @@ export const Header: React.FC = () => {
                       </button>
                     )}
                   </div>
-                  <div className="max-h-64 overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800">
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain divide-y divide-gray-100 dark:divide-zinc-800">
                     {notifications.length === 0 ? (
                       <div className="p-6 text-center text-gray-400 dark:text-zinc-500 text-sm">
                         No new notifications.
