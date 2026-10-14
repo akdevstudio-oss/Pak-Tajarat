@@ -29,12 +29,12 @@ export const HomeView: React.FC = () => {
   // Show the real catalog product instead of promotional/demo products.
   const banners = activeProducts.length > 0 ? [{
     id: 'real-product',
-    title: activeProducts[0].name,
-    subtitle: "Available from Pak-Tijarat",
-    description: activeProducts[0].description,
+    title: "Carry Confidence. Go Further.",
+    subtitle: "One backpack. Every journey.",
+    description: "Made in Pakistan for work, study, and travel.",
     gradient: "from-emerald-800 to-teal-950",
     image: activeProducts[0].image,
-    badge: "CURRENT PRODUCT"
+    badge: "MADE FOR YOUR NEXT MOVE"
   }] : [{
     id: 'empty-catalog',
     title: "Pak-Tijarat",
@@ -112,13 +112,13 @@ export const HomeView: React.FC = () => {
                   className="bg-[#0F9D58] hover:bg-[#0B7B44] text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-900/30 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center space-x-2"
                 >
                   <ShoppingBag size={18} />
-                  <span>Shop Catalog Now</span>
+                  <span>Explore Backpack</span>
                 </button>
                 <button
                   onClick={() => setCurrentView('about')}
                   className="bg-white/15 hover:bg-white/25 text-white font-bold text-sm sm:text-base px-6 py-3.5 rounded-full transition-all duration-200 border border-white/20 flex items-center space-x-1"
                 >
-                  <span>Our Heritage</span>
+                  <span>Our Story</span>
                   <ChevronRight size={16} />
                 </button>
               </div>
