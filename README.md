@@ -7,6 +7,16 @@ Pak-Tijarat is an e-commerce marketplace created for customers and sellers acros
 
 Website: https://www.pak-tajarat.store
 
+## AK Dev Studio — 3D Corporate Brand Concept
+
+The project documentation includes a premium dark-charcoal and neon-green branding concept for **AK Dev Studio**, featuring a dimensional AK emblem, metallic highlights, green lighting, and technology-service labels.
+
+![AK Dev Studio 3D corporate branding concept](docs/ak-dev-studio-3d-brand-concept.svg)
+
+[View the SVG artwork](docs/ak-dev-studio-3d-brand-concept.svg)
+
+> This is a vector concept included in the repository for README and branding presentation. The separately generated photorealistic 3D render is a visual reference and is not embedded as a binary image in this repository.
+
 ## Overview
 
 Pak-Tijarat brings product discovery, shopping, order handling, and store administration together in one web application. The project is built with a modern React-based frontend and supporting server and cloud services.
