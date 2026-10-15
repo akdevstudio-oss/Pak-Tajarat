@@ -34,7 +34,7 @@ async function startServer() {
       const accessKey = process.env.R2_ACCESS_KEY_ID!.trim();
       const secretKey = process.env.R2_SECRET_ACCESS_KEY!.trim();
       const bucket = process.env.R2_BUCKET_NAME!.trim();
-      const endpoint = process.env.R2_ENDPOINT!.trim().replace(/\\/+$/, "");
+      const endpoint = process.env.R2_ENDPOINT!.trim().replace(/\/+$/, "");
       const endpointUrl = new URL(endpoint);
 
       if (
@@ -50,15 +50,15 @@ async function startServer() {
       }
 
       const now = new Date();
-      const amzDate = now.toISOString().replace(/[:-]|\\.\\d{3}/g, "");
+      const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
       const dateStamp = amzDate.slice(0, 8);
       const payloadHash = createHash("sha256").update("").digest("hex");
       const canonicalUri = `/${encodeURIComponent(bucket)}`;
       const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
       const canonicalHeaders =
-        `host:${endpointUrl.host}\\n` +
-        `x-amz-content-sha256:${payloadHash}\\n` +
-        `x-amz-date:${amzDate}\\n`;
+        `host:${endpointUrl.host}\n` +
+        `x-amz-content-sha256:${payloadHash}\n` +
+        `x-amz-date:${amzDate}\n`;
       const canonicalRequest = [
         "HEAD",
         canonicalUri,
@@ -66,14 +66,14 @@ async function startServer() {
         canonicalHeaders,
         signedHeaders,
         payloadHash,
-      ].join("\\n");
+      ].join("\n");
       const scope = `${dateStamp}/auto/s3/aws4_request`;
       const stringToSign = [
         "AWS4-HMAC-SHA256",
         amzDate,
         scope,
         createHash("sha256").update(canonicalRequest).digest("hex"),
-      ].join("\\n");
+      ].join("\n");
 
       const hmac = (key: Buffer | string, value: string) =>
         createHmac("sha256", key).update(value).digest();
