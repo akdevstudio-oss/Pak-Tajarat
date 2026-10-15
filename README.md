@@ -7,15 +7,13 @@ Pak-Tijarat is an e-commerce marketplace created for customers and sellers acros
 
 Website: https://www.pak-tajarat.store
 
-## AK Dev Studio — 3D Corporate Brand Concept
+## AK Dev Studio — 3D Company Banner
 
-The project documentation includes a premium dark-charcoal and neon-green branding concept for **AK Dev Studio**, featuring a dimensional AK emblem, metallic highlights, green lighting, and technology-service labels.
+A wide, banner-style corporate branding concept with a dark technology workspace, metallic silver and neon-green AK emblem, company wordmark, tagline, and service list.
 
-![AK Dev Studio 3D corporate branding concept](docs/ak-dev-studio-3d-brand-concept.svg)
+![Ak DeV Studio 3D company banner](docs/ak-dev-studio-3d-brand-concept.svg)
 
-[View the SVG artwork](docs/ak-dev-studio-3d-brand-concept.svg)
-
-> This is a vector concept included in the repository for README and branding presentation. The separately generated photorealistic 3D render is a visual reference and is not embedded as a binary image in this repository.
+[Open the banner artwork](docs/ak-dev-studio-3d-brand-concept.svg)
 
 ## Overview
 
