@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">AK Dev Studio — 3D Corporate Branding Concept</title>
+  <desc id="desc">A premium dark charcoal and neon green technology-company brand concept, with a dimensional AK emblem and service labels.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#080d0c"/><stop offset=".55" stop-color="#18211e"/><stop offset="1" stop-color="#050807"/></linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="0.9" y2="1"><stop stop-color="#fff"/><stop offset=".45" stop-color="#b9c3c0"/><stop offset="1" stop-color="#66716e"/></linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c4ff6b"/><stop offset=".45" stop-color="#25ef65"/><stop offset="1" stop-color="#008b43"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#00ff66" flood-opacity=".2"/></filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#8effb0" stroke-opacity=".06"/></pattern>
+  </defs>
+  <rect width="1200" height="700" rx="28" fill="url(#bg)"/><rect width="1200" height="700" rx="28" fill="url(#grid)"/>
+  <path d="M0 630H1200" stroke="#25ef65" stroke-opacity=".7" stroke-width="2"/><path d="M0 635H1200" stroke="#25ef65" stroke-opacity=".15" stroke-width="10"/>
+  <g filter="url(#shadow)" transform="translate(0,-5)">
+    <path d="M295 285 405 90 535 315 465 315 405 205 365 285Z" fill="#34403b" transform="translate(8 12)"/>
+    <path d="M295 285 405 90 535 315 465 315 405 205 365 285Z" fill="url(#silver)" stroke="#fff" stroke-opacity=".7" stroke-width="2"/>
+    <path d="M480 315 610 100 690 100 570 315Z" fill="#007b39" transform="translate(8 12)"/>
+    <path d="M480 315 610 100 690 100 570 315Z" fill="url(#green)" stroke="#a6ffb4" stroke-opacity=".65" stroke-width="2"/>
+    <path d="M560 300 620 300 695 420 615 420Z" fill="url(#green)" stroke="#a6ffb4" stroke-opacity=".5" stroke-width="2"/>
+    <path d="M260 300 C355 380 630 380 735 210" fill="none" stroke="#003c22" stroke-width="34" stroke-linecap="round" transform="translate(4 10)"/>
+    <path d="M260 300 C355 380 630 380 735 210" fill="none" stroke="url(#green)" stroke-width="25" stroke-linecap="round"/>
+    <path d="M265 293 C365 365 630 365 732 208" fill="none" stroke="#d4ff9a" stroke-opacity=".85" stroke-width="2"/>
+  </g>
+  <text x="600" y="485" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" letter-spacing="-2" fill="url(#silver)">Ak DeV <tspan fill="#35f477">Studio</tspan></text>
+  <text x="600" y="535" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" letter-spacing="7" fill="#e4eee8">IDEAS <tspan fill="#36f477">|</tspan> CODE <tspan fill="#36f477">|</tspan> REAL SOLUTIONS</text>
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <g fill="#42f77d" font-size="30" font-weight="bold"><text x="160" y="600">&lt;/&gt;</text><text x="380" y="600">▣</text><text x="600" y="600">✧</text><text x="820" y="600">☁</text><text x="1040" y="600">⚙</text></g>
+    <g fill="#e7f0eb" font-size="15"><text x="160" y="625">WEB DEVELOPMENT</text><text x="380" y="625">MOBILE APPS</text><text x="600" y="625">UI/UX DESIGN</text><text x="820" y="625">CLOUD SOLUTIONS</text><text x="1040" y="625">SOFTWARE SOLUTIONS</text></g>
+  </g>
+</svg>
