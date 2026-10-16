@@ -38,6 +38,7 @@ export const MediaLibraryView: React.FC = () => {
           id: 'media-' + Date.now() + '-' + i,
           name: file.name.replace(/\.[^/.]+$/, ""),
           url: result.url,
+          path: result.path,
           size: result.size,
           type: result.type,
           folder: selectedFolder === 'All' ? 'General' : selectedFolder,
