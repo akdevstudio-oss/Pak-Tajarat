@@ -67,7 +67,7 @@ function canonicalQuery(values: Record<string, string>) {
     .map(([k, v]) => awsEncode(k) + "=" + awsEncode(v)).join("&");
 }
 function authorizationFor(method: string, canonicalUri: string, query: string, headers: Record<string,string>, signedHeaders: string, payloadHash: string, c: ReturnType<typeof r2Config>, now: Date) {
-  const amzDate = now.toISOString().replace(/[:-]|\\.\\d{3}/g, "");
+  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
   const dateStamp = amzDate.slice(0, 8);
   const canonicalHeaders = signedHeaders.split(";").map(name => name + ":" + headers[name] + "\n").join("");
   const canonicalRequest = [method, canonicalUri, query, canonicalHeaders, signedHeaders, payloadHash].join("\n");
