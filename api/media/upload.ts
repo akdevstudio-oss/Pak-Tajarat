@@ -43,7 +43,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       res.end(JSON.stringify({ok:false,error:"R2 storage limit reached (8 GB). Delete old media before uploading more.",usedBytes,limitBytes:MAX_STORAGE_BYTES}));
       return;
     }
-    const key = "products/" + Date.now() + "-" + randomUUID() + "." + TYPES[contentType];
+    const requestedFolder = String(req.headers["x-media-folder"] || "products").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40);
+    const allowedFolders = new Set(["branding","banners","categories","products","blog","general"]);
+    const folder = allowedFolders.has(requestedFolder) ? requestedFolder : "general";
+    const key = folder + "/" + Date.now() + "-" + randomUUID() + "." + TYPES[contentType];
     await putR2Object(key, bytes, contentType);
     await db.collection("media").insertOne({key, contentType, sizeBytes:bytes.length, uploadedAt:new Date().toISOString(), uploadedBy:"admin"});
     res.statusCode=201;
