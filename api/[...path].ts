@@ -10,6 +10,7 @@ import authSession from "../lib/api-handlers/auth/session.js";
 import cmsCollection from "../lib/api-handlers/cms/[collection].js";
 import dbHealth from "../lib/api-handlers/db-health.js";
 import mediaObject from "../lib/api-handlers/media-object.js";
+import ordersHandler from "../lib/api-handlers/orders.js";
 import mediaDelete from "../lib/api-handlers/media/delete.js";
 import mediaUpload from "../lib/api-handlers/media/upload.js";
 import productItem from "../lib/api-handlers/products/[id].js";
@@ -26,7 +27,7 @@ const handlers: Record<string, (req: any, res: ServerResponse) => unknown> = {
   "analytics": analytics, "auth": authIndex, "auth/index": authIndex,
   "auth/logout": authLogout, "auth/profile": authProfile, "auth/session": authSession,
   "cms": cmsCollection, "db-health": dbHealth, "media-object": mediaObject,
-  "media/delete": mediaDelete, "media/upload": mediaUpload, "products": productIndex,
+  "media/delete": mediaDelete, "media/upload": mediaUpload, "orders": ordersHandler, "products": productIndex,
   "products/clear": productClear, "r2/health": r2Health,
 };
 export const config = { api: { bodyParser: false } };
