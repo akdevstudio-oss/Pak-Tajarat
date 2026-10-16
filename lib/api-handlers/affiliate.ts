@@ -21,7 +21,7 @@ export default async function handler(req:Req,res:ServerResponse){
    admin?db.collection("affiliateApplications").find({},{projection:{_id:0}}).limit(1000).toArray():[],
    admin?db.collection("withdrawals").find({},{projection:{_id:0}}).limit(1000).toArray():[],
    admin?db.collection("referrals").find({},{projection:{_id:0}}).limit(2000).toArray():[],
-   db.collection("config").findOne({_id:"global"})
+   db.collection<{_id:string; commissionPercentage?:number}>("config").findOne({_id:"global"})
   ]);
   return json(res,200,{ok:true,affiliate,application,referrals,withdrawals,allAffiliates,allApplications,allWithdrawals,allReferrals,commissionRate:Number(config?.commissionPercentage)||10});
  }
@@ -67,7 +67,7 @@ export default async function handler(req:Req,res:ServerResponse){
  if(action==="setCommissionRate"){
   if(!requireAdmin(req,res))return;const rate=Number(body.rate);
   if(!Number.isFinite(rate)||rate<0||rate>100)return json(res,400,{ok:false,error:"Commission rate must be between 0 and 100."});
-  await db.collection("config").updateOne({_id:"global"},{$set:{commissionPercentage:rate}},{upsert:true});return json(res,200,{ok:true,commissionRate:rate});
+  await db.collection<{_id:string; commissionPercentage?:number}>("config").updateOne({_id:"global"},{$set:{commissionPercentage:rate}},{upsert:true});return json(res,200,{ok:true,commissionRate:rate});
  }
  if(action==="applicationStatus"){
   if(!requireAdmin(req,res))return;const id=String(body.id||"").slice(0,150),status=String(body.status||"");
