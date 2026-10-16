@@ -68,8 +68,12 @@ export default async function handler(req:Req,res:ServerResponse){
           if(affiliate){
             const config=await db.collection("config").findOne({_id:"global"});
             const commissionAmount=normalized.reduce((sum,item)=>{
-              const configured=Number(item.product.affiliateCommissionRate ?? config?.commissionPercentage ?? 10);
-              const rate=Number.isFinite(configured)?Math.max(0,Math.min(100,configured)):10;
+              if(item.product.affiliateEnabled===false)return sum;
+              const type=String(item.product.commissionType||"percentage").toLowerCase();
+              const configured=Number(item.product.commissionValue ?? item.product.affiliateCommissionRate ?? config?.commissionPercentage ?? 10);
+              if(!Number.isFinite(configured)||configured<0)return sum;
+              if(type==="fixed")return sum+Math.round(configured*item.quantity);
+              const rate=Math.max(0,Math.min(100,configured));
               return sum+Math.round(Number(item.product.price)*item.quantity*rate/100);
             },0);
             await db.collection("referrals").insertOne({id:"ref-"+randomUUID(),affiliateId,referredUserId:user?.id||"guest-user",orderId,purchaseAmount:total,commissionAmount,status:"pending",date:order.date,type:"conversion",createdAt:now});
