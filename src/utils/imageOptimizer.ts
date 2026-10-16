@@ -7,7 +7,7 @@ export async function optimizeAndUploadImage(
   folder: string,
   maxWidth = 1200,
   quality = 0.85
-): Promise<{ url: string; path: string }> {
+): Promise<{ url: string; path: string; size: number; type: string }> {
   if (!file.type.startsWith('image/')) {
     throw new Error('Please select a valid image file.');
   }
@@ -48,7 +48,7 @@ export async function optimizeAndUploadImage(
     let result: any = {};
     try { result = await response.json(); } catch {}
     if (!response.ok) throw new Error(result.error || 'Could not upload image to Cloudflare R2.');
-    return { url: result.url as string, path: result.key as string };
+    return { url: result.url as string, path: result.key as string, size: optimizedBlob.size, type: optimizedBlob.type };
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
