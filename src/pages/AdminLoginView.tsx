@@ -15,10 +15,21 @@ export const AdminLoginView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   React.useEffect(() => {
-    if (currentUser?.role === 'Admin' || currentUser?.role === 'Worker') {
-      setCurrentView('admin-dashboard');
-    }
-  }, [currentUser?.role, setCurrentView]);
+    let active = true;
+    fetch('/api/admin/session', { credentials: 'same-origin', cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(async data => {
+        if (!active || !data?.authenticated || !data?.user?.email) return;
+        try {
+          await login(data.user.email, 'Master Administrator', true);
+          if (active) setCurrentView('admin-dashboard');
+        } catch (error) {
+          console.error('Could not restore admin UI session:', error);
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   const handleAdminLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,20 +38,26 @@ export const AdminLoginView: React.FC = () => {
     setIsLoading(true);
     setAuthError(null);
     try {
-      const actualAdminEmail = adminEmail || 'admin@paktajarat.pk';
-      const actualAdminPassword = adminPassword || 'admin123';
       const inputTrimmed = email.trim().toLowerCase();
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        credentials: 'same-origin',
+        cache: 'no-store',
+        body: JSON.stringify({ email: inputTrimmed, password })
+      });
 
-      const matchesCustomAdmin = inputTrimmed === actualAdminEmail.toLowerCase() && password === actualAdminPassword;
-      const matchesDefaultFallback =
-        (inputTrimmed === 'admin@paktajarat.pk' || inputTrimmed === 'akdevstudiosolutions@gmail.com') &&
-        password === 'admin123';
-
-      if (matchesCustomAdmin || matchesDefaultFallback) {
-        await login(email, 'Master Administrator', true);
-        addNotification('Master Admin Verified', 'Welcome to full Master Admin Console.', 'success');
+      if (response.ok) {
+        await login(inputTrimmed, 'Master Administrator', true);
+        addNotification('Master Admin Verified', 'Secure administrator session created.', 'success');
         setCurrentView('admin-dashboard');
         return;
+      }
+
+      if (response.status !== 401) {
+        let message = 'Secure admin login is unavailable. Please try again shortly.';
+        try { const result = await response.json(); message = result.error || message; } catch {}
+        throw new Error(message);
       }
 
       const workerMatch = workerAccounts.find(w =>
