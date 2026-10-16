@@ -34,7 +34,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const db = await getDatabase();
     const locks = db.collection<{ _id: string; locked?: boolean; lockedAt?: Date }>("r2_upload_locks");
     await locks.updateOne({_id:"bucket-upload-lock"}, {$setOnInsert:{locked:false}}, {upsert:true});
-    const lock = await locks.findOneAndUpdate({_id:"bucket-upload-lock", locked:{$ne:true}}, {$set:{locked:true, lockedAt:new Date()}}, {returnDocument:"after"});
+    const staleBefore = new Date(Date.now() - 120000);
+    const lock = await locks.findOneAndUpdate({_id:"bucket-upload-lock", $or:[{locked:{$ne:true}},{lockedAt:{$lt:staleBefore}}]}, {$set:{locked:true, lockedAt:new Date()}}, {returnDocument:"after"});
     if (!lock) { res.statusCode=429; res.end(JSON.stringify({ok:false,error:"Another upload is in progress. Please try again shortly."})); return; }
     lockId = true;
     const usedBytes = await getR2UsageBytes();
