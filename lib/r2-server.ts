@@ -119,7 +119,7 @@ export async function deleteR2Object(key: string) {
   const uri = "/" + encodePath(c.bucket + "/" + key);
   const now = new Date();
   const payloadHash = sha256("");
-  const headers = { host: c.host, "x-amz-content-sha256": payloadHash, "x-amz-date": now.toISOString().replace(/[:-]|\\.\\d{3}/g, "") };
+  const headers = { host: c.host, "x-amz-content-sha256": payloadHash, "x-amz-date": now.toISOString().replace(/[:-]|\.\d{3}/g, "") };
   const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
   const signed = authorizationFor("DELETE", uri, "", headers, signedHeaders, payloadHash, c, now);
   const response = await fetch(c.endpoint + uri, { method: "DELETE", headers: { Authorization: signed.authorization, "x-amz-content-sha256": payloadHash, "x-amz-date": signed.amzDate }, signal: AbortSignal.timeout(12000) });
