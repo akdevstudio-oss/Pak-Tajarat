@@ -66,7 +66,7 @@ export default async function handler(req:Req,res:ServerResponse){
         try {
           const affiliate=await db.collection("affiliates").findOne({id:affiliateId,status:"active",activated:true});
           if(affiliate){
-            const config=await db.collection("config").findOne({_id:"global"});
+            const config=await db.collection<{_id:string; commissionPercentage?:number}>("config").findOne({_id:"global"});
             const commissionAmount=normalized.reduce((sum,item)=>{
               if(item.product.affiliateEnabled===false)return sum;
               const type=String(item.product.commissionType||"percentage").toLowerCase();
