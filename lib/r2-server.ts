@@ -87,15 +87,15 @@ export async function getR2UsageBytes() {
     const uri = "/" + encodePath(c.bucket);
     const now = new Date();
     const payloadHash = sha256("");
-    const headers = { host: c.host, "x-amz-content-sha256": payloadHash, "x-amz-date": now.toISOString().replace(/[:-]|\\.\\d{3}/g, "") };
+    const headers = { host: c.host, "x-amz-content-sha256": payloadHash, "x-amz-date": now.toISOString().replace(/[:-]|\.\d{3}/g, "") };
     const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
     const signed = authorizationFor("GET", uri, query, headers, signedHeaders, payloadHash, c, now);
     const response = await fetch(c.endpoint + uri + "?" + query, { headers: { Authorization: signed.authorization, "x-amz-content-sha256": payloadHash, "x-amz-date": signed.amzDate }, signal: AbortSignal.timeout(12000) });
     if (!response.ok) throw Object.assign(new Error("Could not calculate current R2 storage usage (HTTP " + response.status + ")."), { status: 502 });
     const xml = await response.text();
-    for (const match of xml.matchAll(/<Size>(\\d+)<\\/Size>/g)) total += Number(match[1]);
-    const truncated = /<IsTruncated>true<\\/IsTruncated>/.test(xml);
-    const next = xml.match(/<NextContinuationToken>([\\s\\S]*?)<\\/NextContinuationToken>/)?.[1];
+    for (const match of xml.matchAll(/<Size>(\d+)<\/Size>/g)) total += Number(match[1]);
+    const truncated = /<IsTruncated>true<\/IsTruncated>/.test(xml);
+    const next = xml.match(/<NextContinuationToken>([\s\S]*?)<\/NextContinuationToken>/)?.[1];
     if (!truncated) return total;
     if (!next) throw Object.assign(new Error("R2 returned an incomplete storage listing."), { status: 502 });
     token = next.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
@@ -107,7 +107,7 @@ export async function putR2Object(key: string, bytes: Uint8Array, contentType: s
   const uri = "/" + encodePath(c.bucket + "/" + key);
   const now = new Date();
   const payloadHash = sha256(Buffer.from(bytes));
-  const amzDate = now.toISOString().replace(/[:-]|\\.\\d{3}/g, "");
+  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
   const headers = { host: c.host, "content-type": contentType, "x-amz-content-sha256": payloadHash, "x-amz-date": amzDate };
   const signedHeaders = "content-type;host;x-amz-content-sha256;x-amz-date";
   const signed = authorizationFor("PUT", uri, "", headers, signedHeaders, payloadHash, c, now);
@@ -115,7 +115,7 @@ export async function putR2Object(key: string, bytes: Uint8Array, contentType: s
   if (!response.ok) throw Object.assign(new Error("Cloudflare R2 upload failed (HTTP " + response.status + ")."), { status: 502 });
 }
 export async function getR2Object(key: string) {
-  const c = r2Config();
+  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
   const uri = "/" + encodePath(c.bucket + "/" + key);
   const now = new Date();
   const payloadHash = sha256("");
