@@ -204,7 +204,7 @@ export const HomeView: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-4">
-          {Array.from(new Set(activeProducts.map(p => p.category))).map((cat, idx) => (
+          {Array.from(new Set<string>(activeProducts.map(p => String(p.category ?? '')))).map((cat, idx) => (
             <button
               key={`${cat}-${idx}`}
               onClick={() => setCurrentView('products')}
