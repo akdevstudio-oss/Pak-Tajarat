@@ -115,11 +115,11 @@ export async function putR2Object(key: string, bytes: Uint8Array, contentType: s
   if (!response.ok) throw Object.assign(new Error("Cloudflare R2 upload failed (HTTP " + response.status + ")."), { status: 502 });
 }
 export async function getR2Object(key: string) {
-  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
+  const c = r2Config();
   const uri = "/" + encodePath(c.bucket + "/" + key);
   const now = new Date();
   const payloadHash = sha256("");
-  const headers = { host: c.host, "x-amz-content-sha256": payloadHash, "x-amz-date": now.toISOString().replace(/[:-]|\\.\\d{3}/g, "") };
+  const headers = { host: c.host, "x-amz-content-sha256": payloadHash, "x-amz-date": now.toISOString().replace(/[:-]|\.\d{3}/g, "") };
   const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
   const signed = authorizationFor("GET", uri, "", headers, signedHeaders, payloadHash, c, now);
   const response = await fetch(c.endpoint + uri, { headers: { Authorization: signed.authorization, "x-amz-content-sha256": payloadHash, "x-amz-date": signed.amzDate }, signal: AbortSignal.timeout(12000) });
