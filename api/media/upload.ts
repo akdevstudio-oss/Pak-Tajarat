@@ -32,7 +32,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const bytes = await readBody(req);
     if (!bytes.length) { res.statusCode=400; res.end(JSON.stringify({ok:false,error:"Image file is empty."})); return; }
     const db = await getDatabase();
-    const locks = db.collection("r2_upload_locks");
+    const locks = db.collection<{ _id: string; locked?: boolean; lockedAt?: Date }>("r2_upload_locks");
     await locks.updateOne({_id:"bucket-upload-lock"}, {$setOnInsert:{locked:false}}, {upsert:true});
     const lock = await locks.findOneAndUpdate({_id:"bucket-upload-lock", locked:{$ne:true}}, {$set:{locked:true, lockedAt:new Date()}}, {returnDocument:"after"});
     if (!lock) { res.statusCode=429; res.end(JSON.stringify({ok:false,error:"Another upload is in progress. Please try again shortly."})); return; }
