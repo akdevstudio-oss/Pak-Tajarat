@@ -61,6 +61,72 @@ export async function checkR2Bucket() {
   if (!response.ok) throw Object.assign(new Error("R2 did not accept the connectivity check (HTTP " + response.status + ")."), { status: 502 });
 }
 
+
+function canonicalQuery(values: Record<string, string>) {
+  return Object.entries(values).sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => awsEncode(k) + "=" + awsEncode(v)).join("&");
+}
+function authorizationFor(method: string, canonicalUri: string, query: string, headers: Record<string,string>, signedHeaders: string, payloadHash: string, c: ReturnType<typeof r2Config>, now: Date) {
+  const amzDate = now.toISOString().replace(/[:-]|\\.\\d{3}/g, "");
+  const dateStamp = amzDate.slice(0, 8);
+  const canonicalHeaders = signedHeaders.split(";").map(name => name + ":" + headers[name] + "\n").join("");
+  const canonicalRequest = [method, canonicalUri, query, canonicalHeaders, signedHeaders, payloadHash].join("\n");
+  const scope = dateStamp + "/auto/s3/aws4_request";
+  const stringToSign = ["AWS4-HMAC-SHA256", amzDate, scope, sha256(canonicalRequest)].join("\n");
+  const signature = hmac(signingKey(c.secretKey, dateStamp), stringToSign).toString("hex");
+  return { amzDate, authorization: "AWS4-HMAC-SHA256 Credential=" + c.accessKey + "/" + scope + ", SignedHeaders=" + signedHeaders + ", Signature=" + signature };
+}
+export async function getR2UsageBytes() {
+  const c = r2Config();
+  let total = 0;
+  let token = "";
+  for (let page = 0; page < 100; page++) {
+    const params: Record<string,string> = { "list-type": "2" };
+    if (token) params["continuation-token"] = token;
+    const query = canonicalQuery(params);
+    const uri = "/" + encodePath(c.bucket);
+    const now = new Date();
+    const payloadHash = sha256("");
+    const headers = { host: c.host, "x-amz-content-sha256": payloadHash, "x-amz-date": now.toISOString().replace(/[:-]|\\.\\d{3}/g, "") };
+    const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
+    const signed = authorizationFor("GET", uri, query, headers, signedHeaders, payloadHash, c, now);
+    const response = await fetch(c.endpoint + uri + "?" + query, { headers: { Authorization: signed.authorization, "x-amz-content-sha256": payloadHash, "x-amz-date": signed.amzDate }, signal: AbortSignal.timeout(12000) });
+    if (!response.ok) throw Object.assign(new Error("Could not calculate current R2 storage usage (HTTP " + response.status + ")."), { status: 502 });
+    const xml = await response.text();
+    for (const match of xml.matchAll(/<Size>(\\d+)<\\/Size>/g)) total += Number(match[1]);
+    const truncated = /<IsTruncated>true<\\/IsTruncated>/.test(xml);
+    const next = xml.match(/<NextContinuationToken>([\\s\\S]*?)<\\/NextContinuationToken>/)?.[1];
+    if (!truncated) return total;
+    if (!next) throw Object.assign(new Error("R2 returned an incomplete storage listing."), { status: 502 });
+    token = next.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+  }
+  throw Object.assign(new Error("R2 contains too many objects to verify storage usage safely."), { status: 503 });
+}
+export async function putR2Object(key: string, bytes: Uint8Array, contentType: string) {
+  const c = r2Config();
+  const uri = "/" + encodePath(c.bucket + "/" + key);
+  const now = new Date();
+  const payloadHash = sha256(Buffer.from(bytes));
+  const amzDate = now.toISOString().replace(/[:-]|\\.\\d{3}/g, "");
+  const headers = { host: c.host, "content-type": contentType, "x-amz-content-sha256": payloadHash, "x-amz-date": amzDate };
+  const signedHeaders = "content-type;host;x-amz-content-sha256;x-amz-date";
+  const signed = authorizationFor("PUT", uri, "", headers, signedHeaders, payloadHash, c, now);
+  const response = await fetch(c.endpoint + uri, { method: "PUT", headers: { Authorization: signed.authorization, "content-type": contentType, "x-amz-content-sha256": payloadHash, "x-amz-date": signed.amzDate }, body: Buffer.from(bytes), signal: AbortSignal.timeout(20000) });
+  if (!response.ok) throw Object.assign(new Error("Cloudflare R2 upload failed (HTTP " + response.status + ")."), { status: 502 });
+}
+export async function getR2Object(key: string) {
+  const c = r2Config();
+  const uri = "/" + encodePath(c.bucket + "/" + key);
+  const now = new Date();
+  const payloadHash = sha256("");
+  const headers = { host: c.host, "x-amz-content-sha256": payloadHash, "x-amz-date": now.toISOString().replace(/[:-]|\\.\\d{3}/g, "") };
+  const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
+  const signed = authorizationFor("GET", uri, "", headers, signedHeaders, payloadHash, c, now);
+  const response = await fetch(c.endpoint + uri, { headers: { Authorization: signed.authorization, "x-amz-content-sha256": payloadHash, "x-amz-date": signed.amzDate }, signal: AbortSignal.timeout(12000) });
+  if (!response.ok) throw Object.assign(new Error("Media object not found."), { status: response.status === 404 ? 404 : 502 });
+  return { bytes: new Uint8Array(await response.arrayBuffer()), contentType: response.headers.get("content-type") || "application/octet-stream" };
+}
+
 export function createPresignedPut(contentType: string, folder: string, originalName: string) {
   const c = r2Config();
   const extByType: Record<string, string> = {
