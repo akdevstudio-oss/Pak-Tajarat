@@ -62,9 +62,22 @@ export default async function handler(req:Req,res:ServerResponse){
         changed.push(item);
       }
       await orders.insertOne(order);
-      if(affiliateId){
-        const commissionAmount=normalized.reduce((sum,item)=>sum+Math.round(Number(item.product.price)*item.quantity*(Number(item.product.affiliateCommissionRate??10)/100)),0);
-        await db.collection("referrals").insertOne({id:"ref-"+randomUUID(),affiliateId,referredUserId:user?.id||"guest-user",orderId,purchaseAmount:total,commissionAmount,status:"pending",date:order.date,type:"conversion",createdAt:now});
+      if(affiliateId && affiliateId !== user?.id){
+        try {
+          const affiliate=await db.collection("affiliates").findOne({id:affiliateId,status:"active",activated:true});
+          if(affiliate){
+            const config=await db.collection("config").findOne({_id:"global"});
+            const commissionAmount=normalized.reduce((sum,item)=>{
+              const configured=Number(item.product.affiliateCommissionRate ?? config?.commissionPercentage ?? 10);
+              const rate=Number.isFinite(configured)?Math.max(0,Math.min(100,configured)):10;
+              return sum+Math.round(Number(item.product.price)*item.quantity*rate/100);
+            },0);
+            await db.collection("referrals").insertOne({id:"ref-"+randomUUID(),affiliateId,referredUserId:user?.id||"guest-user",orderId,purchaseAmount:total,commissionAmount,status:"pending",date:order.date,type:"conversion",createdAt:now});
+            await db.collection("affiliates").updateOne({id:affiliateId},{$inc:{totalReferrals:1}});
+          }
+        } catch(error) {
+          console.error("Affiliate referral recording failed:",error instanceof Error?error.message:"unknown");
+        }
       }
       const {_id,...safeOrder}=order as any;
       return json(res,201,{ok:true,order:safeOrder});

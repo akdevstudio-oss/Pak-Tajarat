@@ -56,7 +56,13 @@ export default async function handler(req:Req,res:ServerResponse){
   const item={id:"with-"+randomUUID(),affiliateId:user.id,amount,paymentMethod:method,paymentDetails:details,status:"pending",date:date()};
   const debit=await db.collection("affiliates").updateOne({id:user.id,pendingCommission:{$gte:amount}},{$inc:{pendingCommission:-amount}});
   if(!debit.modifiedCount)return json(res,409,{ok:false,error:"Commission balance changed; refresh and retry."});
-  await db.collection("withdrawals").insertOne(item);return json(res,201,{ok:true,withdrawal:item});
+  try { await db.collection("withdrawals").insertOne(item); }
+  catch (error) {
+    await db.collection("affiliates").updateOne({id:user.id},{$inc:{pendingCommission:amount}});
+    console.error("Affiliate withdrawal insert failed:",error instanceof Error?error.message:"unknown");
+    return json(res,502,{ok:false,error:"Could not save the payout request. Your commission balance was restored."});
+  }
+  return json(res,201,{ok:true,withdrawal:item});
  }
  if(action==="setCommissionRate"){
   if(!requireAdmin(req,res))return;const rate=Number(body.rate);
@@ -79,9 +85,12 @@ export default async function handler(req:Req,res:ServerResponse){
   if(!requireAdmin(req,res))return;const id=String(body.id||"").slice(0,150),status=String(body.status||"");
   if(!id||!["pending","approved","rejected"].includes(status))return json(res,400,{ok:false,error:"Invalid withdrawal status."});
   const item=await db.collection("withdrawals").findOne({id});if(!item)return json(res,404,{ok:false,error:"Withdrawal not found."});
-  await db.collection("withdrawals").updateOne({id},{$set:{status}});
-  if(status==="approved"&&item.status!=="approved")await db.collection("affiliates").updateOne({id:item.affiliateId},{$inc:{paidCommission:Number(item.amount)||0}});
-  if(status==="rejected"&&item.status!=="rejected")await db.collection("affiliates").updateOne({id:item.affiliateId},{$inc:{pendingCommission:Number(item.amount)||0}});
+  if(item.status===status)return json(res,200,{ok:true});
+  if(item.status!=="pending")return json(res,409,{ok:false,error:"Only pending payout requests can be approved or rejected."});
+  const changed=await db.collection("withdrawals").updateOne({id,status:"pending"},{$set:{status,reviewedAt:new Date().toISOString()}});
+  if(!changed.modifiedCount)return json(res,409,{ok:false,error:"Payout request changed. Refresh and retry."});
+  if(status==="approved")await db.collection("affiliates").updateOne({id:item.affiliateId},{$inc:{paidCommission:Number(item.amount)||0}});
+  else await db.collection("affiliates").updateOne({id:item.affiliateId},{$inc:{pendingCommission:Number(item.amount)||0}});
   return json(res,200,{ok:true});
  }
  if(action==="processCooling"){
