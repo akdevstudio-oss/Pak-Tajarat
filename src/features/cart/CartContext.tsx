@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CartItem, Coupon, Product } from '../../shared/types';
 import { INITIAL_COUPONS } from '../../data/initialData';
-import { db, auth } from '../../firebase';
-import { collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import { useUI } from '../ui/UIContext';
 import { useAuth } from '../auth/AuthContext';
 import { useProducts } from '../products/ProductsContext';
@@ -56,24 +54,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('pak_tajarat_cart', JSON.stringify(cart));
   }, [cart]);
 
-  // Realtime sync Coupons from Firestore
+  // Load coupons from the MongoDB-backed CMS API.
   useEffect(() => {
-    const unsubscribeCoupons = onSnapshot(collection(db, 'coupons'), (snapshot) => {
-      const list: Coupon[] = [];
-      snapshot.forEach((docSnap) => {
-        list.push(docSnap.data() as Coupon);
-      });
-      if (list.length === 0) {
-        setAllCoupons(INITIAL_COUPONS);
-      } else {
-        setAllCoupons(list);
-      }
-    }, (error) => {
-      console.error("Error reading coupons:", error);
-      setAllCoupons(INITIAL_COUPONS);
-    });
-
-    return () => unsubscribeCoupons();
+    let active = true;
+    fetch('/api/cms/coupons', { cache: 'no-store' })
+      .then(async response => {
+        if (!response.ok) throw new Error('Could not load coupons');
+        return response.json();
+      })
+      .then(data => {
+        if (active && Array.isArray(data.items) && data.items.length) setAllCoupons(data.items as Coupon[]);
+      })
+      .catch(error => console.warn('Coupon sync unavailable; using safe local defaults.', error));
+    return () => { active = false; };
   }, []);
 
   const addToCart = (product: Product, quantity: number = 1) => {
@@ -141,59 +134,31 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addCoupon = async (coup: Coupon) => {
-    const isLocalUser = !currentUser || currentUser.id.startsWith('local-') || !auth.currentUser;
-    if (isLocalUser) {
-      setAllCoupons(prev => [coup, ...prev]);
-      addNotification('Coupon Created (Local)', `Coupon code "${coup.code}" has been created.`, 'success');
-      return;
-    }
-    try {
-      await setDoc(doc(db, 'coupons', coup.code), coup);
-      addNotification('Coupon Created', `Coupon code "${coup.code}" has been created.`, 'success');
-    } catch (err) {
-      console.error("Error creating coupon:", err);
-    }
+    const response = await fetch('/api/cms/coupons', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(coup) });
+    if (!response.ok) throw new Error('Coupon could not be saved. Please sign in as administrator.');
+    setAllCoupons(prev => [coup, ...prev.filter(item => item.code !== coup.code)]);
+    addNotification('Coupon Created', `Coupon code "${coup.code}" has been saved.`, 'success');
   };
 
   const deleteCoupon = async (code: string) => {
-    const isLocalUser = !currentUser || currentUser.id.startsWith('local-') || !auth.currentUser;
-    if (isLocalUser) {
-      setAllCoupons(prev => prev.filter(c => c.code !== code));
-      addNotification('Coupon Deleted (Local)', `Coupon code "${code}" has been removed.`, 'info');
-      return;
-    }
-    try {
-      await deleteDoc(doc(db, 'coupons', code));
-      addNotification('Coupon Deleted', `Coupon code "${code}" has been removed.`, 'info');
-    } catch (err) {
-      console.error("Error deleting coupon:", err);
-    }
+    const response = await fetch('/api/cms/coupons?id=' + encodeURIComponent(code), { method: 'DELETE', credentials: 'include' });
+    if (!response.ok) throw new Error('Coupon could not be deleted.');
+    setAllCoupons(prev => prev.filter(c => c.code !== code));
+    if (activeCoupon?.code === code) setActiveCoupon(null);
+    addNotification('Coupon Deleted', `Coupon code "${code}" has been removed.`, 'info');
   };
 
   const assignCouponReward = async (code: string, affiliateId: string, eligibility: string) => {
-    const isLocalUser = !currentUser || currentUser.id.startsWith('local-') || !auth.currentUser;
-    if (isLocalUser) {
-      setAllCoupons(prev => prev.map(c => c.code === code ? { ...c, isReward: true, assignedTo: affiliateId, eligibility } : c));
-      addNotification('Reward Assigned (Local)', `Coupon ${code} assigned successfully.`, 'success');
+    const existing = allCoupons.find(c => c.code === code);
+    if (!existing) {
+      addNotification('Coupon Error', `Coupon code "${code}" does not exist.`, 'warning');
       return;
     }
-    try {
-      const copDoc = await getDoc(doc(db, 'coupons', code));
-      if (!copDoc.exists()) {
-        addNotification('Coupon Error', `Coupon code "${code}" does not exist.`, 'warning');
-        return;
-      }
-
-      await updateDoc(doc(db, 'coupons', code), {
-        isReward: true,
-        assignedTo: affiliateId,
-        eligibility
-      });
-
-      addNotification('Reward Assigned!', `Coupon ${code} assigned to affiliate for "${eligibility}".`, 'success');
-    } catch (err) {
-      console.error("Error assigning reward", err);
-    }
+    const updated = { ...existing, isReward: true, assignedTo: affiliateId, eligibility };
+    const response = await fetch('/api/cms/coupons?id=' + encodeURIComponent(code), { method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
+    if (!response.ok) throw new Error('Coupon reward could not be saved.');
+    setAllCoupons(prev => prev.map(c => c.code === code ? updated : c));
+    addNotification('Reward Assigned!', `Coupon ${code} assigned to affiliate.`, 'success');
   };
 
   // Compute Cart Totals

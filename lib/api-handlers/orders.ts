@@ -38,7 +38,17 @@ export default async function handler(req:Req,res:ServerResponse){
       normalized.push({product,quantity});
     }
     const shipping=subtotal>5000||subtotal===0?0:250;
-    const requestedDiscount=Math.max(0,Math.min(Number(body.discount)||0,subtotal));
+    let requestedDiscount=0;
+    const couponCode=String(body.couponCode||"").trim().toUpperCase().slice(0,60);
+    if(couponCode){
+      const coupon=await db.collection("coupons").findOne({code:couponCode});
+      if(!coupon)return json(res,400,{ok:false,error:"Coupon is invalid or expired."});
+      if(coupon.minSpend&&subtotal<Number(coupon.minSpend))return json(res,400,{ok:false,error:"Minimum spend for this coupon has not been reached."});
+      if(coupon.isActive===false||coupon.active===false)return json(res,400,{ok:false,error:"This coupon is inactive."});
+      const amount=Number(coupon.discount)||0;
+      requestedDiscount=String(coupon.type||"").toLowerCase()==="fixed"?amount:subtotal*amount/100;
+      requestedDiscount=Math.max(0,Math.min(requestedDiscount,subtotal));
+    }
     const total=Math.max(0,subtotal+shipping-requestedDiscount);
     const orderId="PAK-"+randomUUID().replace(/-/g,"").slice(0,12).toUpperCase();
     const affiliateId=String(body.affiliateId||"").slice(0,120);

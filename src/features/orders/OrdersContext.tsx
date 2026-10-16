@@ -20,7 +20,7 @@ async function readError(response: Response) {
 export const OrdersProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { addNotification } = useUI();
   const { currentUser } = useAuth();
-  const { cart, cartTotals, clearCart } = useCart();
+  const { cart, cartTotals, clearCart, activeCoupon } = useCart();
   const { commissionRate } = useAffiliate();
   const [orders, setOrders] = useState<Order[]>([]);
 
@@ -68,7 +68,7 @@ export const OrdersProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           paymentMethod,
           shippingAddress,
           billingAddress: billingAddress || shippingAddress,
-          discount: cartTotals.discount,
+          couponCode: activeCoupon?.code || '',
           affiliateId: refAffiliateId,
           commissionRate
         })
