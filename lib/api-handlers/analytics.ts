@@ -9,12 +9,13 @@ export default async function handler(req:Req,res:ServerResponse){
   if(!requireAdmin(req,res))return;
   try{
    const db=await getDatabase();
-   const [visitors,events]=await Promise.all([
+   const [visitors,events,sessions]=await Promise.all([
     db.collection("liveVisitors").find({},{projection:{_id:0}}).sort({lastActiveMs:-1}).limit(500).toArray(),
-    db.collection("liveEvents").find({},{projection:{_id:0}}).sort({timestampMs:-1}).limit(50).toArray()
+    db.collection("liveEvents").find({},{projection:{_id:0}}).sort({timestampMs:-1}).limit(50).toArray(),
+    db.collection("trafficSessions").find({},{projection:{_id:0}}).sort({timestamp:-1}).limit(5000).toArray()
    ]);
    const cutoff=Date.now()-5*60*1000;
-   return json(res,200,{ok:true,visitors:visitors.filter(v=>Number(v.lastActiveMs||0)>=cutoff),events});
+   return json(res,200,{ok:true,visitors:visitors.filter(v=>Number(v.lastActiveMs||0)>=cutoff),events,sessions});
   }catch(error){console.error("Analytics read API:",error instanceof Error?error.message:"unknown");return json(res,503,{ok:false,error:"Analytics storage is temporarily unavailable."});}
  }
  if(req.method!=="POST")return json(res,405,{ok:false,error:"Method not allowed."});
