@@ -1,8 +1,9 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { clearAdminCookie } from "../../lib/admin-session";
-export default function handler(req: VercelRequest, res: VercelResponse) {
+function json(res: ServerResponse, status: number, body: unknown) { res.statusCode=status; res.setHeader("Content-Type","application/json; charset=utf-8"); res.end(JSON.stringify(body)); }
+export default function handler(req: IncomingMessage, res: ServerResponse) {
   res.setHeader("Cache-Control", "no-store");
-  if (req.method !== "POST") return res.status(405).json({ ok: false });
+  if (req.method !== "POST") return json(res,405,{ok:false});
   clearAdminCookie(res);
-  return res.status(200).json({ ok: true });
+  return json(res,200,{ok:true});
 }
