@@ -6,8 +6,6 @@ import {
   ShoppingBag, HelpCircle, ChevronRight, RefreshCw, Layers, MapPin, Activity, 
   Gift, Tag
 } from 'lucide-react';
-import { db, handleFirestoreError, OperationType } from '../firebase';
-import { collection, onSnapshot, query, doc, setDoc } from 'firebase/firestore';
 
 interface EnterpriseAnalyticsProps {
   products: any[];
@@ -31,83 +29,25 @@ export const EnterpriseAnalytics: React.FC<EnterpriseAnalyticsProps> = ({
   const [sessions, setSessions] = useState<any[]>([]);
   const [isSessionsLoading, setIsSessionsLoading] = useState(true);
 
-  // Seed default traffic sessions if DB is empty to provide rich visual baseline
-  const seedInitialTrafficSessions = async () => {
-    try {
-      const batchList: any[] = [];
-      const referrers = [
-        'Google Search', 'WhatsApp', 'Facebook', 'Instagram', 
-        'Direct Traffic', 'TikTok', 'YouTube', 'Referral Websites'
-      ];
-      const devices = ['mobile', 'desktop', 'tablet'];
-      const browsers = ['Chrome', 'Safari', 'Firefox', 'Edge'];
-      const osList = ['Android', 'iOS', 'Windows', 'macOS', 'Linux'];
-      const pakCities = ['Karachi', 'Lahore', 'Islamabad', 'Faisalabad', 'Peshawar', 'Quetta', 'Multan', 'Sialkot', 'Gujranwala', 'Rawalpindi'];
-      
-      for (let i = 0; i < 120; i++) {
-        const daysAgo = Math.floor(Math.random() * 30);
-        const hoursAgo = Math.floor(Math.random() * 24);
-        const minsAgo = Math.floor(Math.random() * 60);
-        const timestamp = new Date(Date.now() - (daysAgo * 24 * 60 * 60 * 1000) - (hoursAgo * 60 * 60 * 1000) - (minsAgo * 60 * 1000)).toISOString();
-        
-        const sId = `sess-seed-${Math.random().toString(36).substring(2, 11)}`;
-        const logId = `log-seed-${i}-${Date.now()}`;
-        
-        const referrer = referrers[i % referrers.length];
-        const deviceType = devices[i % devices.length];
-        const browser = browsers[i % browsers.length];
-        const os = osList[i % osList.length];
-        const city = pakCities[i % pakCities.length];
-        
-        batchList.push({
-          id: logId,
-          path: i % 4 === 0 ? 'home' : i % 4 === 1 ? 'cart' : i % 4 === 2 ? 'details' : 'affiliate-portal',
-          uid: 'guest',
-          timestamp,
-          deviceType,
-          browser,
-          os,
-          city,
-          country: 'Pakistan',
-          language: 'en-US',
-          referrer,
-          sessionId: sId
-        });
-      }
-      
-      for (const item of batchList) {
-        await setDoc(doc(db, 'trafficSessions', item.id), item);
-      }
-    } catch (err) {
-      console.warn("Could not seed initial traffic sessions:", err);
-    }
-  };
-
-  // Listen to trafficSessions in real-time
+  // Load real analytics sessions from the MongoDB-backed API; never seed fabricated traffic.
   useEffect(() => {
-    let unsubscribe = () => {};
-    try {
-      const q = query(collection(db, 'trafficSessions'));
-      unsubscribe = onSnapshot(q, (snapshot) => {
-        const list: any[] = [];
-        snapshot.forEach((doc) => {
-          list.push(doc.data());
-        });
-        
-        if (list.length === 0) {
-          seedInitialTrafficSessions();
-        } else {
-          setSessions(list);
-          setIsSessionsLoading(false);
-        }
-      }, (error) => {
-        handleFirestoreError(error, OperationType.LIST, 'trafficSessions');
-      });
-    } catch (err) {
-      console.error("Error setting up traffic sessions listener:", err);
-      setIsSessionsLoading(false);
-    }
-    return () => unsubscribe();
+    let active = true;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const loadSessions = async () => {
+      try {
+        const response = await fetch('/api/analytics', { credentials: 'include', cache: 'no-store' });
+        if (!response.ok) throw new Error('Analytics API unavailable.');
+        const data = await response.json();
+        if (active && data?.ok) setSessions(Array.isArray(data.sessions) ? data.sessions : []);
+      } catch (error) {
+        if (active) console.warn('Could not load analytics sessions:', error);
+      } finally {
+        if (active) setIsSessionsLoading(false);
+      }
+    };
+    void loadSessions();
+    interval = setInterval(() => { void loadSessions(); }, 30000);
+    return () => { active = false; if (interval) clearInterval(interval); };
   }, []);
 
   // Fluctuating metric based on actual live sessions
