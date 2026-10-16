@@ -3,6 +3,7 @@ import adminLogin from "../lib/api-handlers/admin/login.js";
 import adminLogout from "../lib/api-handlers/admin/logout.js";
 import adminSession from "../lib/api-handlers/admin/session.js";
 import analytics from "../lib/api-handlers/analytics.js";
+import affiliateHandler from "../lib/api-handlers/affiliate.js";
 import authIndex from "../lib/api-handlers/auth/index.js";
 import authLogout from "../lib/api-handlers/auth/logout.js";
 import authProfile from "../lib/api-handlers/auth/profile.js";
@@ -24,7 +25,7 @@ type ApiRequest = IncomingMessage & {
 };
 const handlers: Record<string, (req: any, res: ServerResponse) => unknown> = {
   "admin/login": adminLogin, "admin/logout": adminLogout, "admin/session": adminSession,
-  "analytics": analytics, "auth": authIndex, "auth/index": authIndex,
+  "analytics": analytics, "affiliate": affiliateHandler, "auth": authIndex, "auth/index": authIndex,
   "auth/logout": authLogout, "auth/profile": authProfile, "auth/session": authSession,
   "cms": cmsCollection, "db-health": dbHealth, "media-object": mediaObject,
   "media/delete": mediaDelete, "media/upload": mediaUpload, "orders": ordersHandler, "products": productIndex,
