@@ -1,9 +1,22 @@
 import type { IncomingMessage,ServerResponse } from "node:http";
 import { getDatabase } from "../mongodb-server.js";
+import { requireAdmin } from "../admin-session.js";
 type Req=IncomingMessage&{body?:any};
 function json(res:ServerResponse,status:number,data:unknown){res.statusCode=status;res.setHeader("Content-Type","application/json; charset=utf-8");res.setHeader("Cache-Control","no-store");res.end(JSON.stringify(data));}
 const clean=(v:any,max=160)=>String(v??"").slice(0,max);
 export default async function handler(req:Req,res:ServerResponse){
+ if(req.method==="GET"){
+  if(!requireAdmin(req,res))return;
+  try{
+   const db=await getDatabase();
+   const [visitors,events]=await Promise.all([
+    db.collection("liveVisitors").find({},{projection:{_id:0}}).sort({lastActiveMs:-1}).limit(500).toArray(),
+    db.collection("liveEvents").find({},{projection:{_id:0}}).sort({timestampMs:-1}).limit(50).toArray()
+   ]);
+   const cutoff=Date.now()-5*60*1000;
+   return json(res,200,{ok:true,visitors:visitors.filter(v=>Number(v.lastActiveMs||0)>=cutoff),events});
+  }catch(error){console.error("Analytics read API:",error instanceof Error?error.message:"unknown");return json(res,503,{ok:false,error:"Analytics storage is temporarily unavailable."});}
+ }
  if(req.method!=="POST")return json(res,405,{ok:false,error:"Method not allowed."});
  try{const body=req.body||{};const db=await getDatabase();
  if(body.kind==="heartbeat"&&body.visitor&&body.session){const v=body.visitor,s=body.session,id=clean(v.sessionId,120);if(!id)return json(res,400,{ok:false,error:"Invalid session."});

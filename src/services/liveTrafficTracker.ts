@@ -1,5 +1,3 @@
-import { doc, setDoc, collection } from 'firebase/firestore';
-import { db } from '../firebase';
 
 export interface LiveVisitorData {
   id: string;
@@ -176,11 +174,7 @@ export async function sendLiveHeartbeat(currentView: string, currentUser?: any) 
       screenResolution: info.screenResolution
     };
 
-    // Write to Firestore liveVisitors
-    await setDoc(doc(db, 'liveVisitors', sessionId), payload, { merge: true });
-
-    // Also update trafficSessions so overall historical analytics capture real data
-    await setDoc(doc(db, 'trafficSessions', sessionId), {
+    const session = {
       id: sessionId,
       path: currentView,
       uid: userId,
@@ -193,7 +187,13 @@ export async function sendLiveHeartbeat(currentView: string, currentUser?: any) 
       language: 'en-US',
       referrer: info.referrer,
       sessionId
-    }, { merge: true });
+    };
+    await fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({ kind: 'heartbeat', visitor: payload, session })
+    });
   } catch (err) {
     // Non-blocking, keep browsing smooth
     console.debug('Traffic heartbeat silent notice:', err);
@@ -238,8 +238,12 @@ export async function trackLiveEvent(
       extra: extra || {}
     };
 
-    // Save to Firestore liveEvents collection
-    await setDoc(doc(db, 'liveEvents', eventId), eventPayload);
+    await fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({ kind: 'event', event: eventPayload })
+    });
   } catch (err) {
     console.debug('Live event track notice:', err);
   }
