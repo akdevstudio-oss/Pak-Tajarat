@@ -17,23 +17,24 @@ export default async function handler(req:Request,res:ServerResponse){
   try{
     const collection=(await getDatabase()).collection(collectionName);
     if(req.method==="GET"){
-      if(id){const doc=await collection.findOne({id},{projection:{_id:0}});return json(res,doc?200:404,{ok:!!doc,item:doc});}
+      if(id){const filter=route==="coupons"?{code:id.toUpperCase()}:{id};const doc=await collection.findOne(filter,{projection:{_id:0}});return json(res,doc?200:404,{ok:!!doc,item:doc});}
       const items=await collection.find({}, {projection:{_id:0}}).limit(1000).toArray();
       return json(res,200,{ok:true,items});
     }
     if(req.method==="DELETE"){
       if(!id)return json(res,400,{ok:false,error:"Document ID required."});
-      const result=await collection.deleteOne({id});return json(res,result.deletedCount?200:404,{ok:!!result.deletedCount});
+      const filter=route==="coupons"?{code:id.toUpperCase()}:{id};const result=await collection.deleteOne(filter);return json(res,result.deletedCount?200:404,{ok:!!result.deletedCount});
     }
     if(req.method==="POST"||req.method==="PUT"||req.method==="PATCH"){
       const body=req.body&&typeof req.body==="object"?req.body:{};
-      const docId=String(body.id||id).slice(0,150);
+      const docId=String(body.id||id||(route==="coupons"?body.code:"")).slice(0,150);
       if(!docId)return json(res,400,{ok:false,error:"Document ID required."});
       const document={...body,id:docId,updatedAt:new Date().toISOString()};delete (document as any)._id;
       if(req.method==="PATCH"){
-        const existing=await collection.findOne({id:docId});
-        await collection.replaceOne({id:docId},{...(existing||{}),...document,id:docId},{upsert:true});
-      }else await collection.replaceOne({id:docId,},{...document},{upsert:true});
+        const filter=route==="coupons"?{code:docId.toUpperCase()}:{id:docId};
+        const existing=await collection.findOne(filter);
+        await collection.replaceOne(filter,{...(existing||{}),...document,id:docId},{upsert:true});
+      }else { const filter=route==="coupons"?{code:String(document.code||docId).toUpperCase()}:{id:docId}; await collection.replaceOne(filter,{...document},{upsert:true}); }
       return json(res,200,{ok:true,item:document});
     }
     res.setHeader("Allow","GET, POST, PUT, PATCH, DELETE");return json(res,405,{ok:false,error:"Method not allowed."});
