@@ -23,23 +23,12 @@ type ApiRequest = IncomingMessage & {
 };
 
 const handlers: Record<string, (req: any, res: ServerResponse) => unknown> = {
-  "admin/login": adminLogin,
-  "admin/logout": adminLogout,
-  "admin/session": adminSession,
-  "analytics": analytics,
-  "auth": authIndex,
-  "auth/index": authIndex,
-  "auth/logout": authLogout,
-  "auth/profile": authProfile,
-  "auth/session": authSession,
-  "cms": cmsCollection,
-  "db-health": dbHealth,
-  "media-object": mediaObject,
-  "media/delete": mediaDelete,
-  "media/upload": mediaUpload,
-  "products": productIndex,
-  "products/clear": productClear,
-  "r2/health": r2Health,
+  "admin/login": adminLogin, "admin/logout": adminLogout, "admin/session": adminSession,
+  "analytics": analytics, "auth": authIndex, "auth/index": authIndex,
+  "auth/logout": authLogout, "auth/profile": authProfile, "auth/session": authSession,
+  "cms": cmsCollection, "db-health": dbHealth, "media-object": mediaObject,
+  "media/delete": mediaDelete, "media/upload": mediaUpload, "products": productIndex,
+  "products/clear": productClear, "r2/health": r2Health,
 };
 
 export const config = { api: { bodyParser: false } };
@@ -75,7 +64,10 @@ async function parseJsonBody(req: ApiRequest, res: ServerResponse): Promise<bool
 export default async function handler(req: ApiRequest, res: ServerResponse) {
   res.setHeader("X-Content-Type-Options", "nosniff");
   const pathname = new URL(req.url || "/", "http://localhost").pathname;
-  const route = pathname.replace(/^\/api\/?/, "").replace(/\/+$/, "");
+  const internalRoute = req.query?.__internal_route;
+  const route = (typeof internalRoute === "string" && internalRoute
+    ? internalRoute
+    : pathname.replace(/^\/api\/?/, "")).replace(/^\/+|\/+$/g, "");
   const parts = route.split("/").filter(Boolean).map(part => {
     try { return decodeURIComponent(part); } catch { return part; }
   });
@@ -96,8 +88,6 @@ export default async function handler(req: ApiRequest, res: ServerResponse) {
     res.end(JSON.stringify({ ok: false, error: "API route not found." }));
     return;
   }
-
-  // The upload handler streams raw image bytes itself.
   if (key !== "media/upload" && !(await parseJsonBody(req, res))) return;
   return selected(req, res);
 }
