@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { checkR2Bucket } from "../../lib/r2-server";
+import { checkR2Bucket } from "../../r2-server";
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   res.setHeader("Cache-Control", "no-store");

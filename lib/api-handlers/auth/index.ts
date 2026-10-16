@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { getDatabase } from "../../lib/mongodb-server";
-import { createUserToken, setUserCookie } from "../../lib/user-session";
+import { getDatabase } from "../../mongodb-server";
+import { createUserToken, setUserCookie } from "../../user-session";
 type Req=IncomingMessage&{body?:any};
 function json(res:ServerResponse,status:number,body:unknown){res.statusCode=status;res.setHeader("Content-Type","application/json; charset=utf-8");res.setHeader("Cache-Control","no-store");res.end(JSON.stringify(body));}
 function safeUser(u:any){return {id:String(u.id),email:String(u.email),fullName:String(u.fullName||""),role:"User",phone:String(u.phone||""),addresses:Array.isArray(u.addresses)?u.addresses:[]};}

@@ -1,4 +1,4 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getDatabase } from "../../lib/mongodb-server";
-import { readUserSession } from "../../lib/user-session";
+import { getDatabase } from "../../mongodb-server";
+import { readUserSession } from "../../user-session";
 export default async function handler(req:IncomingMessage,res:ServerResponse){res.setHeader("Cache-Control","no-store");const session=readUserSession(req);if(!session){res.statusCode=401;return res.end(JSON.stringify({ok:false}));}try{const u=await (await getDatabase()).collection("users").findOne({id:session.id},{projection:{_id:0,passwordHash:0,passwordSalt:0}});if(!u){res.statusCode=401;return res.end(JSON.stringify({ok:false}));}res.setHeader("Content-Type","application/json");res.end(JSON.stringify({ok:true,user:{id:u.id,email:u.email,fullName:u.fullName,role:"User",phone:u.phone||"",addresses:u.addresses||[]}}));}catch{res.statusCode=503;res.end(JSON.stringify({ok:false,error:"Database unavailable."}));}}

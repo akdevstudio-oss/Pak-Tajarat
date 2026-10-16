@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getR2Object } from "../lib/r2-server";
+import { getR2Object } from "../r2-server";
 type Request = IncomingMessage & { query?: Record<string,string|string[]|undefined> };
 function json(res: ServerResponse,status:number,body:unknown){res.statusCode=status;res.setHeader("Content-Type","application/json; charset=utf-8");res.end(JSON.stringify(body));}
 export default async function handler(req: Request, res: ServerResponse) {
