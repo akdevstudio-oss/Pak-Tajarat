@@ -32,10 +32,11 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const bytes = await readBody(req);
     if (!bytes.length) { res.statusCode=400; res.end(JSON.stringify({ok:false,error:"Image file is empty."})); return; }
     const db = await getDatabase();
-    const locks = db.collection<{ _id: string; locked?: boolean; lockedAt?: Date }>("r2_upload_locks");
+    const locks = db.collection<{ _id: string; locked?: boolean; lockedAt?: Date; lockToken?: string }>("r2_upload_locks");
     await locks.updateOne({_id:"bucket-upload-lock"}, {$setOnInsert:{locked:false}}, {upsert:true});
     const staleBefore = new Date(Date.now() - 120000);
-    const lock = await locks.findOneAndUpdate({_id:"bucket-upload-lock", $or:[{locked:{$ne:true}},{lockedAt:{$lt:staleBefore}}]}, {$set:{locked:true, lockedAt:new Date()}}, {returnDocument:"after"});
+    const lockToken = randomUUID();
+    const lock = await locks.findOneAndUpdate({_id:"bucket-upload-lock", $or:[{locked:{$ne:true}},{lockedAt:{$lt:staleBefore}}]}, {$set:{locked:true, lockedAt:new Date(), lockToken}}, {returnDocument:"after"});
     if (!lock) { res.statusCode=429; res.end(JSON.stringify({ok:false,error:"Another upload is in progress. Please try again shortly."})); return; }
     lockId = true;
     const usedBytes = await getR2UsageBytes();
@@ -59,7 +60,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.end(JSON.stringify({ok:false,error:e.status===413 ? e.message : "Image upload failed. Check the R2 and MongoDB connection, then try again."}));
   } finally {
     if (lockId) {
-      try { await (await getDatabase()).collection<{ _id: string; locked?: boolean; lockedAt?: Date }>("r2_upload_locks").updateOne({_id:"bucket-upload-lock"}, {$set:{locked:false}, $unset:{lockedAt:""}}); } catch {}
+      try { await (await getDatabase()).collection<{ _id: string; locked?: boolean; lockedAt?: Date; lockToken?: string }>("r2_upload_locks").updateOne({_id:"bucket-upload-lock", lockToken}, {$set:{locked:false}, $unset:{lockedAt:"", lockToken:""}}); } catch {}
     }
   }
 }
