@@ -58,7 +58,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.end(JSON.stringify({ok:false,error:e.status===413 ? e.message : "Image upload failed. Check the R2 and MongoDB connection, then try again."}));
   } finally {
     if (lockId) {
-      try { await (await getDatabase()).collection("r2_upload_locks").updateOne({_id:"bucket-upload-lock"}, {$set:{locked:false}, $unset:{lockedAt:""}}); } catch {}
+      try { await (await getDatabase()).collection<{ _id: string; locked?: boolean; lockedAt?: Date }>("r2_upload_locks").updateOne({_id:"bucket-upload-lock"}, {$set:{locked:false}, $unset:{lockedAt:""}}); } catch {}
     }
   }
 }
