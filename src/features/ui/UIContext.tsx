@@ -166,7 +166,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     return DEFAULT_BRANDING_CONFIG;
   });
   const [siteCategories, setSiteCategories] = useState<CategoryItem[]>(DEFAULT_SITE_CATEGORIES);
-  const [mediaLibrary, setMediaLibrary] = useState<MediaItem[]>([]);
+  const [mediaLibrary, setMediaLibrary] = useState<MediaItem[]>(() => {
+    try { const saved = localStorage.getItem('pak_tajarat_media_library'); return saved ? JSON.parse(saved) : []; } catch { return []; }
+  });
   const [seoConfig, setSeoConfig] = useState<SeoConfig>(DEFAULT_SEO_CONFIG);
   const [heroBanners, setHeroBanners] = useState<HeroBanner[]>(DEFAULT_HERO_BANNERS);
   const [blogs, setBlogs] = useState<BlogPost[]>(() => {
@@ -283,6 +285,14 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         try { localStorage.setItem('pak_tajarat_blogs', JSON.stringify(result.items)); } catch {}
       })
       .catch(error => console.warn('MongoDB blogs fetch unavailable; using local cache.', error));
+    fetch('/api/cms/media', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (!active || !Array.isArray(result?.items)) return;
+        setMediaLibrary(result.items);
+        try { localStorage.setItem('pak_tajarat_media_library', JSON.stringify(result.items)); } catch {}
+      })
+      .catch(() => {});
     fetch('/api/cms/worker_accounts', { cache: 'no-store' })
       .then(response => response.ok ? response.json() : null)
       .then(result => {
@@ -404,17 +414,47 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const addMediaItem = async (item: MediaItem) => {
-    setMediaLibrary(prev => [item, ...prev]);
+    setMediaLibrary(prev => {
+      const updated = [item, ...prev.filter(m => m.id !== item.id)];
+      try { localStorage.setItem('pak_tajarat_media_library', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    try { await persistCms('media', item.id, 'PUT', item); }
+    catch (error) { console.warn('Could not save media metadata to MongoDB:', error); }
     addNotification('Media Added 🖼️', `Media file ${item.name} uploaded.`, 'success');
   };
 
   const updateMediaItem = async (item: MediaItem) => {
-    setMediaLibrary(prev => prev.map(m => m.id === item.id ? item : m));
+    setMediaLibrary(prev => {
+      const updated = prev.map(m => m.id === item.id ? item : m);
+      try { localStorage.setItem('pak_tajarat_media_library', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    await persistCms('media', item.id, 'PUT', item);
   };
 
   const deleteMediaItem = async (id: string) => {
-    setMediaLibrary(prev => prev.filter(m => m.id !== id));
-    addNotification('Media Deleted', 'Item removed from media library.', 'warning');
+    const item = mediaLibrary.find(m => m.id === id);
+    if (item?.path) {
+      const response = await fetch('/api/media/delete', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: item.path, id: item.id })
+      });
+      if (!response.ok) {
+        let message = 'Could not delete image from Cloudflare R2.';
+        try { const result = await response.json(); message = result.error || message; } catch {}
+        throw new Error(message);
+      }
+    } else {
+      await persistCms('media', id, 'DELETE');
+    }
+    setMediaLibrary(prev => {
+      const updated = prev.filter(m => m.id !== id);
+      try { localStorage.setItem('pak_tajarat_media_library', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    addNotification('Media Deleted', 'Image removed from the media library and storage.', 'warning');
   };
 
   const updateSeoConfig = async (config: Partial<SeoConfig>) => {
