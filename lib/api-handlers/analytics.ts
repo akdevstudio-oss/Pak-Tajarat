@@ -1,5 +1,5 @@
 import type { IncomingMessage,ServerResponse } from "node:http";
-import { getDatabase } from "../mongodb-server";
+import { getDatabase } from "../mongodb-server.js";
 type Req=IncomingMessage&{body?:any};
 function json(res:ServerResponse,status:number,data:unknown){res.statusCode=status;res.setHeader("Content-Type","application/json; charset=utf-8");res.setHeader("Cache-Control","no-store");res.end(JSON.stringify(data));}
 const clean=(v:any,max=160)=>String(v??"").slice(0,max);

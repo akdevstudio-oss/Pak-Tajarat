@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getDatabase } from "../../mongodb-server";
-import { requireAdmin } from "../../admin-session";
+import { getDatabase } from "../../mongodb-server.js";
+import { requireAdmin } from "../../admin-session.js";
 type Request = IncomingMessage & { body?: any; query?: Record<string,string|string[]|undefined> };
 const COLLECTIONS: Record<string,string> = { branding:"cms_branding", blogs:"blogs", worker_accounts:"worker_accounts", media:"cms_media" };
 function json(res:ServerResponse,status:number,body:unknown){res.statusCode=status;res.setHeader("Content-Type","application/json; charset=utf-8");res.end(JSON.stringify(body));}

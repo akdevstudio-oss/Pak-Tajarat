@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createAdminToken, setAdminCookie } from "../../admin-session";
+import { createAdminToken, setAdminCookie } from "../../admin-session.js";
 type Request = IncomingMessage & { body?: any };
 function json(res: ServerResponse, status: number, body: unknown) { res.statusCode=status; res.setHeader("Content-Type","application/json; charset=utf-8"); res.end(JSON.stringify(body)); }
 export default function handler(req: Request, res: ServerResponse) {

@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getDatabase } from "../mongodb-server";
+import { getDatabase } from "../mongodb-server.js";
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   res.setHeader("Cache-Control", "no-store");

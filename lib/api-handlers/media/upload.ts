@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
-import { getDatabase } from "../../mongodb-server";
-import { requireAdmin } from "../../admin-session";
-import { getR2UsageBytes, putR2Object } from "../../r2-server";
+import { getDatabase } from "../../mongodb-server.js";
+import { requireAdmin } from "../../admin-session.js";
+import { getR2UsageBytes, putR2Object } from "../../r2-server.js";
 
 export const config = { api: { bodyParser: false } };
 const MAX_STORAGE_BYTES = 8 * 1024 * 1024 * 1024;

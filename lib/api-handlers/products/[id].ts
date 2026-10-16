@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getDatabase } from "../../mongodb-server";
-import { requireAdmin } from "../../admin-session";
+import { getDatabase } from "../../mongodb-server.js";
+import { requireAdmin } from "../../admin-session.js";
 type Request = IncomingMessage & { body?: any; query?: Record<string,string|string[]|undefined> };
 function json(res: ServerResponse, status: number, body: unknown) { res.statusCode=status; res.setHeader("Content-Type","application/json; charset=utf-8"); res.end(JSON.stringify(body)); }
 export default async function handler(req: Request, res: ServerResponse) {
