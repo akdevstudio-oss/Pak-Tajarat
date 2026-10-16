@@ -1,0 +1,45 @@
+name: Migration branch validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "lib/**"
+      - "api/**"
+      - "shared/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "vite.config.ts"
+      - "vercel.json"
+      - ".github/workflows/**"
+  push:
+    branches: [remove-firebase-add-mongodb-r2]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pak-tijarat-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Type-check
+        run: npm run lint
+      - name: Build application and server
+        run: npm run build
