@@ -6,8 +6,6 @@ import {
 import { DEFAULT_BRANDING_CONFIG, DEFAULT_SITE_CATEGORIES, DEFAULT_SEO_CONFIG, DEFAULT_HERO_BANNERS, INITIAL_BLOGS } from '../../data/initialData';
 import { applySeoAndBrandingToHead } from '../../utils/seoManager';
 import { getInitialRoute } from '../../utils/seo';
-import { collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../../firebase';
 
 export interface UIContextType {
   // Theme
@@ -95,6 +93,20 @@ export interface UIContextType {
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
+
+async function persistCms(collectionName: string, id: string, method: 'POST' | 'PUT' | 'PATCH' | 'DELETE', data?: unknown) {
+  const query = id ? `?id=${encodeURIComponent(id)}` : '';
+  const response = await fetch(`/api/cms/${collectionName}${query}`, {
+    method, credentials: 'same-origin',
+    headers: data === undefined ? { Accept: 'application/json' } : { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: data === undefined ? undefined : JSON.stringify(data), cache: 'no-store'
+  });
+  if (!response.ok) {
+    let message = 'Could not save this setting to MongoDB.';
+    try { const result = await response.json(); message = result.error || message; } catch {}
+    throw new Error(message);
+  }
+}
 
 export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Theme State
@@ -246,119 +258,40 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     applySeoAndBrandingToHead(seoConfig, brandingConfig);
   }, [seoConfig, brandingConfig]);
 
-  // Branding & Logo Realtime sync from Firestore
+  // Load cloud-managed CMS content from MongoDB, keeping cached settings as a fallback.
   useEffect(() => {
-    const unsubscribeBranding = onSnapshot(doc(db, 'config', 'branding'), (snapshot) => {
-      if (snapshot.exists()) {
-        const cloudData = snapshot.data() as Partial<SiteBrandingConfig>;
-        setBrandingConfig(prev => {
-          const merged = { ...prev, ...cloudData };
-          try {
-            localStorage.setItem('pak_tajarat_branding_config', JSON.stringify(merged));
-          } catch (_) {}
-          
-          setLogoConfig(lPrev => ({
-            ...lPrev,
-            logoImageUrl: merged.logoImageUrl !== undefined ? (merged.logoImageUrl || '') : lPrev.logoImageUrl,
-            logoType: merged.logoType || (merged.logoImageUrl ? 'image' : 'vector'),
-            customText: merged.customText || lPrev.customText,
-            faviconUrl: merged.faviconUrl !== undefined ? (merged.faviconUrl || '') : lPrev.faviconUrl
-          }));
-
-          return merged;
-        });
-      }
-    }, (err) => {
-      console.warn("Branding real-time sync warning:", err);
-    });
-
-    return () => unsubscribeBranding();
-  }, []);
-
-  // Worker Accounts Realtime sync from Firestore
-  useEffect(() => {
-    const unsubscribeWorkers = onSnapshot(collection(db, 'worker_accounts'), (snapshot) => {
-      const list: WorkerAccount[] = [];
-      snapshot.forEach((docSnap) => {
-        list.push({ id: docSnap.id, ...docSnap.data() } as WorkerAccount);
-      });
-      if (list.length > 0) {
-        setWorkerAccounts(list);
-        try {
-          localStorage.setItem('pak_tajarat_worker_accounts', JSON.stringify(list));
-        } catch (_) {}
-      }
-    }, (err) => {
-      console.warn("Worker accounts snapshot error:", err);
-    });
-    return () => unsubscribeWorkers();
-  }, []);
-
-  // Blogs Realtime sync from Firestore
-  useEffect(() => {
-    const unsubscribeBlogs = onSnapshot(collection(db, 'blogs'), (snapshot) => {
-      const items: BlogPost[] = [];
-      snapshot.forEach((docSnap) => {
-        items.push({ id: docSnap.id, ...docSnap.data() } as BlogPost);
-      });
-
-      const savedLocal = localStorage.getItem('pak_tajarat_blogs');
-      let localBlogs: BlogPost[] = [];
-      if (savedLocal) {
-        try { localBlogs = JSON.parse(savedLocal); } catch (_) {}
-      }
-
-      if (items.length === 0) {
-        if (localBlogs.length > 0) {
-          setBlogs(localBlogs);
-        } else {
-          setBlogs(INITIAL_BLOGS);
-          try {
-            localStorage.setItem('pak_tajarat_blogs', JSON.stringify(INITIAL_BLOGS));
-          } catch (_) {}
-        }
-      } else {
-        const blogMap = new Map<string, BlogPost>();
-        items.forEach(item => blogMap.set(item.id, item));
-
-        // Preserve any recent local additions not yet in Firestore snapshot
-        if (Array.isArray(localBlogs)) {
-          localBlogs.forEach(lb => {
-            if (!blogMap.has(lb.id)) {
-              blogMap.set(lb.id, lb);
-            }
-          });
-        }
-
-        // Preserve INITIAL_BLOGS if not removed
-        INITIAL_BLOGS.forEach(ib => {
-          if (!blogMap.has(ib.id)) {
-            blogMap.set(ib.id, ib);
-          }
-        });
-
-        const mergedList = Array.from(blogMap.values());
-        setBlogs(mergedList);
-        try {
-          localStorage.setItem('pak_tajarat_blogs', JSON.stringify(mergedList));
-        } catch (_) {}
-      }
-    }, (err) => {
-      console.warn("Blogs realtime sync error:", err);
-      const savedLocal = localStorage.getItem('pak_tajarat_blogs');
-      if (savedLocal) {
-        try {
-          const parsed = JSON.parse(savedLocal);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setBlogs(parsed);
-            return;
-          }
-        } catch (_) {}
-      }
-      setBlogs(INITIAL_BLOGS);
-    });
-
-    return () => unsubscribeBlogs();
+    let active = true;
+    fetch('/api/cms/branding', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (!active || !result?.item) return;
+        const merged = { ...DEFAULT_BRANDING_CONFIG, ...result.item } as SiteBrandingConfig;
+        setBrandingConfig(merged);
+        setLogoConfig(prev => ({
+          ...prev, logoImageUrl: merged.logoImageUrl || '',
+          logoType: merged.logoType || (merged.logoImageUrl ? 'image' : 'vector'),
+          customText: merged.customText || prev.customText, faviconUrl: merged.faviconUrl || ''
+        }));
+        try { localStorage.setItem('pak_tajarat_branding_config', JSON.stringify(merged)); } catch {}
+      })
+      .catch(error => console.warn('MongoDB branding fetch unavailable; using local cache.', error));
+    fetch('/api/cms/blogs', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (!active || !Array.isArray(result?.items)) return;
+        setBlogs(result.items);
+        try { localStorage.setItem('pak_tajarat_blogs', JSON.stringify(result.items)); } catch {}
+      })
+      .catch(error => console.warn('MongoDB blogs fetch unavailable; using local cache.', error));
+    fetch('/api/cms/worker_accounts', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (!active || !Array.isArray(result?.items)) return;
+        setWorkerAccounts(result.items);
+        try { localStorage.setItem('pak_tajarat_worker_accounts', JSON.stringify(result.items)); } catch {}
+      })
+      .catch(() => {});
+    return () => { active = false; };
   }, []);
 
   // Notifications logic
@@ -457,9 +390,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
     // 3. Persist permanently to Cloud Firestore
     try {
-      await setDoc(doc(db, 'config', 'branding'), updated, { merge: true });
+      await persistCms('branding', 'branding', 'PUT', { ...updated, id: 'branding' });
     } catch (err) {
-      console.error("Firestore branding save error:", err);
+      console.error("MongoDB branding save error:", err);
     }
 
     addNotification('Branding Updated 🎨', 'Branding & favicon permanently saved.', 'success');
@@ -570,9 +503,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       return updated;
     });
     try {
-      await setDoc(doc(db, 'blogs', publishedBlog.id), cleanUndefinedProps(publishedBlog));
+      await persistCms('blogs', publishedBlog.id, 'PUT', cleanUndefinedProps(publishedBlog));
     } catch (err) {
-      console.warn("Firestore blog save warning:", err);
+      console.warn("MongoDB blog save warning:", err);
     }
     addNotification('Blog Published 📝', `Article "${publishedBlog.title}" published and saved permanently!`, 'success');
   };
@@ -591,9 +524,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       return updated;
     });
     try {
-      await setDoc(doc(db, 'blogs', updatedBlog.id), cleanUndefinedProps(updatedBlog), { merge: true });
+      await persistCms('blogs', updatedBlog.id, 'PUT', cleanUndefinedProps(updatedBlog));
     } catch (err) {
-      console.warn("Firestore blog update warning:", err);
+      console.warn("MongoDB blog update warning:", err);
     }
     addNotification('Blog Updated 📝', `Article "${updatedBlog.title}" updated and saved live!`, 'success');
   };
@@ -607,9 +540,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       return updated;
     });
     try {
-      await deleteDoc(doc(db, 'blogs', id));
+      await persistCms('blogs', id, 'DELETE');
     } catch (err) {
-      console.warn("Firestore blog delete error:", err);
+      console.warn("MongoDB blog delete error:", err);
     }
     addNotification('Blog Deleted', 'Article deleted from database.', 'warning');
   };
@@ -628,9 +561,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       return updated;
     });
     try {
-      await setDoc(doc(db, 'worker_accounts', newWorker.id), newWorker);
+      await persistCms('worker_accounts', newWorker.id, 'PUT', newWorker);
     } catch (err) {
-      console.error("Firestore worker account creation error:", err);
+      console.error("MongoDB worker account creation error:", err);
     }
     addNotification('Worker Account Created 🔑', `Worker ${newWorker.workerName} (${newWorker.id}) registered successfully!`, 'success');
   };
@@ -644,9 +577,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       return updated;
     });
     try {
-      await updateDoc(doc(db, 'worker_accounts', workerId), { status });
+      await persistCms('worker_accounts', workerId, 'PATCH', { id: workerId, status });
     } catch (err) {
-      console.error("Firestore worker account status update error:", err);
+      console.error("MongoDB worker account status update error:", err);
     }
     addNotification('Worker Status Updated', `Worker status set to ${status.toUpperCase()}`, 'info');
   };
@@ -660,9 +593,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       return updated;
     });
     try {
-      await deleteDoc(doc(db, 'worker_accounts', workerId));
+      await persistCms('worker_accounts', workerId, 'DELETE');
     } catch (err) {
-      console.error("Firestore worker account delete error:", err);
+      console.error("MongoDB worker account delete error:", err);
     }
     addNotification('Worker Account Removed', `Worker account deleted successfully.`, 'warning');
   };
@@ -676,9 +609,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       return updated;
     });
     try {
-      await updateDoc(doc(db, 'worker_accounts', workerId), { workerPasskey: newPasskey });
+      await persistCms('worker_accounts', workerId, 'PATCH', { id: workerId, workerPasskey: newPasskey });
     } catch (err) {
-      console.error("Firestore worker passkey update error:", err);
+      console.error("MongoDB worker passkey update error:", err);
     }
     addNotification('Worker Password Updated 🔑', `New passkey set for worker ${workerId}`, 'success');
   };
