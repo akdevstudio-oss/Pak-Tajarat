@@ -398,7 +398,7 @@ export const LiveTrafficMonitor: React.FC = () => {
             <span>Showing latest {filteredEvents.length} live click events</span>
             <span className="text-emerald-400 flex items-center space-x-1">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Live Firestore Connection Active</span>
+              <span>Live Analytics Connection Active</span>
             </span>
           </div>
         </div>
