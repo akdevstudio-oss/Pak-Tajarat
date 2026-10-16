@@ -28,6 +28,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   const contentType = String(req.headers["content-type"] || "").split(";")[0].trim().toLowerCase();
   if (!TYPES[contentType]) { res.statusCode=415; res.end(JSON.stringify({ok:false,error:"Only JPEG, PNG, WebP, AVIF and GIF images are allowed."})); return; }
   let lockId = false;
+  let lockToken = "";
   try {
     const bytes = await readBody(req);
     if (!bytes.length) { res.statusCode=400; res.end(JSON.stringify({ok:false,error:"Image file is empty."})); return; }
@@ -35,7 +36,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const locks = db.collection<{ _id: string; locked?: boolean; lockedAt?: Date; lockToken?: string }>("r2_upload_locks");
     await locks.updateOne({_id:"bucket-upload-lock"}, {$setOnInsert:{locked:false}}, {upsert:true});
     const staleBefore = new Date(Date.now() - 120000);
-    const lockToken = randomUUID();
+    lockToken = randomUUID();
     const lock = await locks.findOneAndUpdate({_id:"bucket-upload-lock", $or:[{locked:{$ne:true}},{lockedAt:{$lt:staleBefore}}]}, {$set:{locked:true, lockedAt:new Date(), lockToken}}, {returnDocument:"after"});
     if (!lock) { res.statusCode=429; res.end(JSON.stringify({ok:false,error:"Another upload is in progress. Please try again shortly."})); return; }
     lockId = true;
