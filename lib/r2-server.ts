@@ -1,6 +1,6 @@
 import { createHash, createHmac, randomUUID } from "node:crypto";
 
-const sha256 = (value: string) => createHash("sha256").update(value).digest("hex");
+const sha256 = (value: string | Buffer | Uint8Array) => createHash("sha256").update(value).digest("hex");
 const hmac = (key: Buffer | string, value: string) => createHmac("sha256", key).update(value).digest();
 const awsEncode = (value: string) => encodeURIComponent(value).replace(/[!'()*]/g, c => "%" + c.charCodeAt(0).toString(16).toUpperCase());
 const encodePath = (value: string) => value.split("/").map(awsEncode).join("/");
