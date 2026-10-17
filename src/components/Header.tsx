@@ -207,7 +207,7 @@ export const Header: React.FC = () => {
       )}
 
       {/* Main Navbar */}
-      <div className="bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md transition-colors duration-300">
+      <div className="bg-white/95 dark:bg-[#121212]/95 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 md:h-18 flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Brand Logo */}
