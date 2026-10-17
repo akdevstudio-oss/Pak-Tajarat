@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import adminLogin from "../lib/api-handlers/admin/login.js";
 import adminLogout from "../lib/api-handlers/admin/logout.js";
+import adminChangePassword from "../lib/api-handlers/admin/change-password.js";
 import adminSession from "../lib/api-handlers/admin/session.js";
 import analytics from "../lib/api-handlers/analytics.js";
 import affiliateHandler from "../lib/api-handlers/affiliate.js";
@@ -24,7 +25,7 @@ type ApiRequest = IncomingMessage & {
   query?: Record<string, string | string[] | undefined>;
 };
 const handlers: Record<string, (req: any, res: ServerResponse) => unknown> = {
-  "admin/login": adminLogin, "admin/logout": adminLogout, "admin/session": adminSession,
+  "admin/login": adminLogin, "admin/logout": adminLogout, "admin/session": adminSession, "admin/change-password": adminChangePassword,
   "analytics": analytics, "affiliate": affiliateHandler, "auth": authIndex, "auth/index": authIndex,
   "auth/logout": authLogout, "auth/profile": authProfile, "auth/session": authSession,
   "cms": cmsCollection, "db-health": dbHealth, "media-object": mediaObject,
