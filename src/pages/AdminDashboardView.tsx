@@ -1,5 +1,3 @@
-import { storage } from '../firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { Product, Order, CATEGORIES, BlogPost, Coupon, Review, Affiliate } from '../shared/types';
@@ -485,18 +483,22 @@ export const AdminDashboardView: React.FC = () => {
       const file = files[i];
       let finalUrl = '';
       try {
-        const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const storageRef = ref(storage, `products/${Date.now()}_${safeFileName}`);
-        const snapshot = await uploadBytes(storageRef, file);
-        finalUrl = await getDownloadURL(snapshot.ref);
-      } catch (err) {
-        console.warn('Firebase Storage upload warning, falling back to local compressed DataURL:', err);
-        const dataUrl = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
+        if (!file.type.startsWith('image/')) throw new Error('Please select an image file.');
+        const response = await fetch('/api/media/upload', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': file.type, 'X-Media-Folder': 'products' },
+          body: file
         });
-        finalUrl = await compressImage(dataUrl);
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.ok || !result.url) {
+          throw new Error(result.error || 'Image upload failed. Check the 4 MB file limit and R2 setup.');
+        }
+        finalUrl = result.url;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Please try again.';
+        console.warn('Cloudflare R2 image upload failed:', message);
+        addNotification('Image Upload Failed', message, 'warning');
       }
       if (finalUrl) uploadedList.push(finalUrl);
     }

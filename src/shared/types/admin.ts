@@ -63,6 +63,7 @@ export interface MediaItem {
   id: string;
   name: string;
   url: string;
+  path?: string; // Cloudflare R2 object key used for storage cleanup
   folder: string; // 'Branding' | 'Banners' | 'Categories' | 'Products' | 'Blog' | 'General'
   size?: number; // bytes
   type?: string; // mime type

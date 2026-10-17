@@ -1,8 +1,5 @@
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { storage } from '../firebase';
-
 /**
- * Resizes and compresses an image in the browser before uploading it to Firebase Storage.
+ * Resizes and compresses an image in the browser before uploading it to Cloudflare R2.
  * Returns the public download URL and the uploaded object path.
  */
 export async function optimizeAndUploadImage(
@@ -10,7 +7,7 @@ export async function optimizeAndUploadImage(
   folder: string,
   maxWidth = 1200,
   quality = 0.85
-): Promise<{ url: string; path: string }> {
+): Promise<{ url: string; path: string; size: number; type: string }> {
   if (!file.type.startsWith('image/')) {
     throw new Error('Please select a valid image file.');
   }
@@ -42,12 +39,16 @@ export async function optimizeAndUploadImage(
       );
     });
 
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').replace(/\.[^.]+$/, '') || 'image';
-    const path = `${folder.replace(/^\/+|\/+$/g, '')}/${Date.now()}-${safeName}.webp`;
-    const objectRef = ref(storage, path);
-    await uploadBytes(objectRef, optimizedBlob, { contentType: 'image/webp' });
-    const url = await getDownloadURL(objectRef);
-    return { url, path };
+    const response = await fetch('/api/media/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'image/webp', 'X-Media-Folder': folder },
+      credentials: 'same-origin',
+      body: optimizedBlob
+    });
+    let result: any = {};
+    try { result = await response.json(); } catch {}
+    if (!response.ok) throw new Error(result.error || 'Could not upload image to Cloudflare R2.');
+    return { url: result.url as string, path: result.key as string, size: optimizedBlob.size, type: optimizedBlob.type };
   } finally {
     URL.revokeObjectURL(imageUrl);
   }

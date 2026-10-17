@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { collection, onSnapshot, query, orderBy, limit, doc, setDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
 import { LiveVisitorData, LiveEventData, trackLiveEvent } from '../../services/liveTrafficTracker';
 import { 
   Activity, Users, MousePointer, Smartphone, Laptop, Tablet, Globe, 
@@ -34,67 +32,31 @@ export const LiveTrafficMonitor: React.FC = () => {
     } catch (_) {}
   };
 
-  // 1. Real-time Live Visitors Listener
+  // Poll MongoDB-backed analytics API for current visitors and recent events.
   useEffect(() => {
-    const visitorsQuery = query(collection(db, 'liveVisitors'));
-    const unsubscribe = onSnapshot(visitorsQuery, (snapshot) => {
-      const list: LiveVisitorData[] = [];
-      const now = Date.now();
-      // Consider active if heartbeat was within the last 5 minutes
-      const activeWindowMs = 5 * 60 * 1000;
-
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data() as LiveVisitorData;
-        const lastMs = data.lastActiveMs || (data.lastActive ? new Date(data.lastActive).getTime() : 0);
-        if (now - lastMs < activeWindowMs) {
-          list.push(data);
-        }
-      });
-
-      // Sort by most recently active first
-      list.sort((a, b) => (b.lastActiveMs || 0) - (a.lastActiveMs || 0));
-      setVisitors(list);
-      setIsLoading(false);
-    }, (err) => {
-      console.warn('Live visitors snapshot notice:', err);
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  // 2. Real-time Live Events & Click Stream Listener
-  useEffect(() => {
-    const eventsQuery = query(
-      collection(db, 'liveEvents'),
-      orderBy('timestampMs', 'desc'),
-      limit(50)
-    );
-
-    const unsubscribe = onSnapshot(eventsQuery, (snapshot) => {
-      const list: LiveEventData[] = [];
-      let isFirstDoc = true;
-
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data() as LiveEventData;
-        list.push(data);
-
-        // If a brand new event arrived, trigger audio feedback
-        if (isFirstDoc) {
-          if (lastEventIdRef.current && lastEventIdRef.current !== data.id) {
-            playClickSound();
-          }
-          lastEventIdRef.current = data.id;
-          isFirstDoc = false;
-        }
-      });
-
-      setEvents(list);
-    }, (err) => {
-      console.warn('Live events snapshot notice:', err);
-    });
-
-    return () => unsubscribe();
+    let active = true;
+    const refresh = async () => {
+      try {
+        const response = await fetch('/api/analytics', { credentials: 'include', cache: 'no-store' });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) throw new Error(data.error || 'Analytics API unavailable');
+        if (!active) return;
+        const nextVisitors = Array.isArray(data.visitors) ? data.visitors as LiveVisitorData[] : [];
+        const nextEvents = Array.isArray(data.events) ? data.events as LiveEventData[] : [];
+        const previousId = lastEventIdRef.current;
+        if (previousId && nextEvents[0]?.id && previousId !== nextEvents[0].id) playClickSound();
+        if (nextEvents[0]?.id) lastEventIdRef.current = nextEvents[0].id;
+        setVisitors(nextVisitors);
+        setEvents(nextEvents);
+      } catch (error) {
+        console.warn('Live analytics refresh notice:', error);
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    };
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 10000);
+    return () => { active = false; window.clearInterval(interval); };
   }, [soundEnabled]);
 
   // Filter events
@@ -172,7 +134,8 @@ export const LiveTrafficMonitor: React.FC = () => {
       userId: 'guest'
     };
 
-    await setDoc(doc(db, 'liveEvents', simEventId), simPayload);
+    const response = await fetch('/api/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ kind: 'event', event: simPayload }) });
+    if (!response.ok) throw new Error('Could not save test event.');
   };
 
   return (
@@ -192,7 +155,7 @@ export const LiveTrafficMonitor: React.FC = () => {
             <span>Live Customers & Traffic Stream</span>
           </h1>
           <p className="text-xs text-zinc-400 mt-1 max-w-2xl leading-relaxed">
-            Every customer visit, active user on your website, and real-time button/product click is captured instantly via live Firestore stream.
+            Every customer visit, active user on your website, and real-time button/product click is captured through the MongoDB-backed analytics API.
           </p>
         </div>
 
@@ -435,7 +398,7 @@ export const LiveTrafficMonitor: React.FC = () => {
             <span>Showing latest {filteredEvents.length} live click events</span>
             <span className="text-emerald-400 flex items-center space-x-1">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Live Firestore Connection Active</span>
+              <span>Live Analytics Connection Active</span>
             </span>
           </div>
         </div>

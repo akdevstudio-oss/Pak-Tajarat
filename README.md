@@ -1,114 +1,53 @@
 # Pak-Tijarat
 ### Pakistan’s Trusted Digital Marketplace
 
-Pak-Tijarat is an e-commerce marketplace created for customers and sellers across Pakistan, with a focus on a simple shopping experience, trusted service, and a clean green-and-white brand identity.
+Pak-Tijarat is a Pakistan-focused e-commerce marketplace with a responsive storefront, product discovery, cart and checkout, order management, affiliate workflows, and an administration area.
 
 **Designed and developed by AK Dev Studio.**
 
 Website: https://www.pak-tajarat.store
 
-## AK Dev Studio — 3D Company Banner
-
-A wide, banner-style corporate branding concept with a dark technology workspace, metallic silver and neon-green AK emblem, company wordmark, tagline, and service list.
-
-![Ak DeV Studio 3D company banner](docs/ak-dev-studio-3d-brand-concept.svg)
-
-[Open the banner artwork](docs/ak-dev-studio-3d-brand-concept.svg)
-
-## Overview
-
-Pak-Tijarat brings product discovery, shopping, order handling, and store administration together in one web application. The project is built with a modern React-based frontend and supporting server and cloud services.
-
-## Key Areas
-
-- **Online storefront** — browse products and explore product details.
-- **Product discovery** — category-based shopping and product search where enabled.
-- **Shopping and orders** — cart and checkout workflows.
-- **Store administration** — tools for managing store content and day-to-day operations.
-- **Cloud services** — Firebase services are used for configured application functionality.
-- **Responsive interface** — designed to work across desktop and mobile screens.
-- **Pakistan-focused commerce** — checkout and delivery options depend on the active store configuration.
-
-> Available payment methods, delivery services, and other features may depend on the current deployment settings and enabled integrations.
-
 ## Technology
+- React, TypeScript, Vite, Tailwind CSS
+- MongoDB for application data
+- Cloudflare R2 for product and site media
+- Express-compatible API handlers
+- React Router, Lucide React, Motion
 
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- Firebase
-- Express
-- React Router
-- Lucide React
-- Motion
+## Features
+- Storefront, product listings and product detail pages
+- Cart, checkout, coupons and order management
+- Admin-managed products, categories, content and media
+- Affiliate applications, referrals, commissions and payout requests
+- Image upload endpoint restricted to authorized administrators
+- R2 media storage guardrail: maximum 8 GiB total bucket usage enforced before uploads; each image is limited to 4 MiB
 
-## Requirements
-
-- Node.js (LTS recommended)
-- npm
-- Access to the project's required Firebase configuration and any enabled service credentials
-
-## Run Locally
-
-1. Clone the repository and open its directory:
-
+## Run locally
+1. Install Node.js LTS and npm.
+2. Clone the repository:
    ```bash
    git clone https://github.com/akdevstudio-oss/Pak-Tajarat.git
    cd Pak-Tajarat
    ```
+3. Install dependencies with `npm install`.
+4. Configure the required environment variables in `.env.local` (never commit credentials). See `docs/MONGODB_SETUP.md` and `docs/CLOUDFLARE_R2_SETUP.md`.
+5. Run `npm run dev`.
 
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Create a local environment file named `.env.local` and add the configuration values required by the application. Use the deployment settings or the project's environment-variable documentation as the source of truth. Do not commit private keys, tokens, or production credentials.
-
-4. Start the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-5. Open the local URL printed in your terminal.
-
-## Build for Production
-
-Create a production build:
-
+## Build and checks
 ```bash
 npm run build
-```
-
-Start the built server:
-
-```bash
-npm start
-```
-
-Run the TypeScript check:
-
-```bash
 npm run lint
 ```
 
-## Configuration and Security
+## Required deployment configuration
+Configure MongoDB and Cloudflare R2 credentials as environment variables in the hosting dashboard. Keep all access keys server-side. The public website must never receive R2 secret keys or database credentials.
 
-- Keep secrets and private credentials out of source control.
-- Configure production environment variables in the hosting provider.
-- Verify Firebase access rules and authorized domains before launch.
-- Use secure, provider-approved payment configuration for any enabled payment gateway.
-- Test checkout, order handling, and admin permissions before deploying changes to production.
-
-## Deployment
-
-The application is configured for a Node.js-based build and can be deployed to a compatible hosting platform. Set all required environment variables in the deployment project's settings, then run the production build and verify the deployed website.
+## Important deployment notes
+- This repository's migration work is developed on the `remove-firebase-add-mongodb-r2` branch; production `main` is kept separate until migration checks pass.
+- The application must be tested against real configured MongoDB and R2 credentials before launch.
+- Storage usage checks require the R2 credentials to have permission to list bucket objects, in addition to read/write/delete permissions required by the app.
+- No paid hosting or add-on upgrade is required as part of these code changes. Provider usage, quotas, and billing are controlled by the account and provider plan.
 
 ## Project
-
-**Pak-Tijarat**  
-*Pakistan’s Trusted Digital Marketplace*
-
+**Pak-Tijarat** — *Pakistan’s Trusted Digital Marketplace*  
 Created by **AK Dev Studio**.

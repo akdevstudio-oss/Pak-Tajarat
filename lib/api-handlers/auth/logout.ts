@@ -1,0 +1,1 @@
+import type { IncomingMessage,ServerResponse } from "node:http";import { clearUserCookie } from "../../user-session.js";export default function handler(req:IncomingMessage,res:ServerResponse){if(req.method!=="POST"){res.statusCode=405;return res.end();}clearUserCookie(res);res.setHeader("Content-Type","application/json");res.end(JSON.stringify({ok:true}));}

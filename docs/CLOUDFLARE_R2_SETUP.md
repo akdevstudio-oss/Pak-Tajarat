@@ -1,35 +1,48 @@
 # Cloudflare R2 setup for Pak-Tijarat
 
-## Vercel variables
+Pak-Tijarat stores product and site images in Cloudflare R2. Image uploads go through the server-side API; the browser never receives R2 access keys. Public image reads are served by `/api/media-object?key=...`.
 
-Configure these on both Production and Preview:
+## Vercel environment variables
 
-- `R2_ACCOUNT_ID`
-- `R2_ENDPOINT` — `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`
-- `R2_BUCKET_NAME`
-- `R2_ACCESS_KEY_ID`
-- `R2_SECRET_ACCESS_KEY` (sensitive; never expose in browser code)
-- `R2_PUBLIC_BASE_URL` — an actual R2 custom domain or enabled public bucket URL for serving images
-- `FIREBASE_API_KEY` — Firebase Web API key for the existing Firebase app
-- `R2_ADMIN_EMAILS` — comma-separated exact administrator email allowlist
+Set these securely in Vercel for the environments you intend to use:
 
-Do not prefix R2 secrets with `VITE_` or `NEXT_PUBLIC_`. Redeploy after changing environment variables.
+- `R2_ACCOUNT_ID` — Cloudflare account ID.
+- `R2_ENDPOINT` — `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`.
+- `R2_BUCKET_NAME` — existing R2 bucket name.
+- `R2_ACCESS_KEY_ID` — R2 API token access key.
+- `R2_SECRET_ACCESS_KEY` — secret key; never expose it in client code.
+- `PAK_TIJARAT_ADMIN_EMAIL` — exact admin login email.
+- `PAK_TIJARAT_ADMIN_PASSWORD` — strong admin password.
+- `PAK_TIJARAT_SESSION_SECRET` — random secret of at least 32 characters, used to sign the HttpOnly admin session cookie.
+- `MONGODB_URI` and `MONGODB_DB_NAME` — MongoDB connection and database name.
 
-## Health endpoint
+Do not use `VITE_` or `NEXT_PUBLIC_` prefixes for secrets. Redeploy after changing environment variables. Never paste database URIs, passwords, or R2 secret keys into chat or commit them to Git.
 
-`GET /api/r2/health` is a read-only signed bucket check and never returns credentials or bucket contents. A successful response contains `ok: true`.
+## Health checks
 
-## Upload security and media delivery
+- `GET /api/db-health` checks the MongoDB connection.
+- `GET /api/r2/health` performs a signed, read-only R2 bucket check. A successful response contains `ok: true`.
 
-Uploads must be authorized against the Firebase login and an explicit server-side administrator allowlist. The browser must never receive R2 access keys. Use short-lived, content-type-restricted presigned PUT URLs. The bucket needs a configured public delivery domain if product images should be displayed to visitors; keep write credentials private.
+Vercel preview deployments may require authentication before either endpoint can be opened. Test these endpoints from an authenticated preview session or the deployment logs; do not assume a health check passed just because the deployment built successfully.
 
-## 8 GB storage policy
+## Upload access and image delivery
 
-Cloudflare R2 does not automatically stop at 8 GB. A per-file size limit alone is not a hard total-storage quota. Do not assume a hard 8 GB cap until total bucket usage tracking and concurrent-upload reservations are implemented and verified. Monitor R2 usage and billing in Cloudflare.
+- `POST /api/media/upload` requires the signed administrator session created by the admin login endpoint.
+- Only JPEG, PNG, WebP, AVIF and GIF are accepted; each upload is limited to 4 MiB.
+- Uploaded media is delivered through `/api/media-object?key=...`; a public R2 custom domain is not required by this delivery path.
+- The upload API checks total bucket object size before writing. It uses a MongoDB lock to reduce concurrent-upload races and refuses the upload if the 8 GiB cap would be exceeded.
+- The R2 access token must have permission to list objects (for usage checks), read objects, write objects and delete objects as needed by the app. If listing fails, uploads fail closed rather than bypassing the limit.
 
-## Verification
+## 8 GiB storage guardrail
 
-1. Set all variables for Preview and Production.
-2. Open `/api/r2/health` on the deployed site.
-3. Confirm the response has `ok: true` before moving media uploads from Firebase Storage to R2.
-4. Never share the Secret Access Key in chat, source code, or screenshots.
+The application enforces an 8 GiB upload guardrail; Cloudflare R2 itself does not automatically stop usage at that value. Do not treat this application guardrail as a provider-level quota: existing uploads made outside this API, simultaneous external writers, provider-side accounting, and operational failures can affect actual bucket usage. Keep this bucket dedicated to Pak-Tijarat media and avoid writing to it outside the application if you want the guardrail to remain meaningful.
+
+## Verification before production
+
+1. Confirm the required environment variables exist in Vercel Preview and Production without exposing their values.
+2. Sign in to the admin area on a protected preview deployment.
+3. Confirm `/api/db-health` and `/api/r2/health` report success.
+4. Test one small image upload, confirm it displays on the site, and test deletion.
+5. Confirm an unauthenticated upload returns HTTP 401.
+6. Confirm oversized uploads are rejected and that the 8 GiB check fails closed if bucket listing is unavailable.
+7. Only then consider merging the migration branch into production.
