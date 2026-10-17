@@ -24,11 +24,6 @@ export default async function handler(req: Request, res: ServerResponse) {
     return json(res,200,{ok:true,user:{email:expectedEmail,role:"Admin"}});
   } catch (error) {
     console.error("Admin login credential lookup failed:", error instanceof Error ? error.name : "UnknownError");
-    // Preserve env-based first login if MongoDB is temporarily unavailable.
-    if (expectedPassword && password === expectedPassword) {
-      try { setAdminCookie(res, createAdminToken(expectedEmail)); return json(res,200,{ok:true,user:{email:expectedEmail,role:"Admin"}}); }
-      catch {}
-    }
     return json(res,503,{ok:false,error:"Admin authentication service is temporarily unavailable."});
   }
 }
