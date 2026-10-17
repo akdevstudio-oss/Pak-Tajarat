@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
-import { createHash, createHmac } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 async function startServer() {
   const app = express();
@@ -120,6 +120,87 @@ async function startServer() {
         message: "Unable to reach Cloudflare R2. Verify configuration and try again.",
       });
     }
+  });
+
+
+  // Server-side administrator authentication. Credentials are read only from
+  // Vercel environment variables; never authenticate using browser/localStorage data.
+  const adminLoginAttempts = new Map<string, { count: number; resetAt: number }>();
+  const safeEqual = (a: string, b: string) => {
+    const left = Buffer.from(a);
+    const right = Buffer.from(b);
+    return left.length === right.length && timingSafeEqual(left, right);
+  };
+  const readCookie = (header: string | undefined, name: string) => {
+    const item = (header || "").split(";").map(v => v.trim()).find(v => v.startsWith(name + "="));
+    return item ? decodeURIComponent(item.slice(name.length + 1)) : "";
+  };
+  const signAdminSession = (payload: string, secret: string) =>
+    createHmac("sha256", secret).update(payload).digest("base64url");
+  const adminSessionCookie = "paktijarat_admin_session";
+
+  app.post("/api/admin/login", (req, res) => {
+    const configuredEmail = process.env.PAK_TIJARAT_ADMIN_EMAIL?.trim().toLowerCase();
+    const configuredPassword = process.env.PAK_TIJARAT_ADMIN_PASSWORD;
+    const sessionSecret = process.env.PAK_TIJARAT_SESSION_SECRET;
+    if (!configuredEmail || !configuredPassword || !sessionSecret) {
+      return res.status(503).json({ error: "Admin login is not configured on the server. Check the production admin environment variables." });
+    }
+
+    const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim();
+    const now = Date.now();
+    const attempts = adminLoginAttempts.get(ip);
+    if (attempts && attempts.resetAt > now && attempts.count >= 10) {
+      return res.status(429).json({ error: "Too many sign-in attempts. Wait 15 minutes and try again." });
+    }
+    if (!attempts || attempts.resetAt <= now) adminLoginAttempts.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 });
+    else attempts.count += 1;
+
+    const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+    const password = typeof req.body?.password === "string" ? req.body.password : "";
+    if (!safeEqual(email, configuredEmail) || !safeEqual(password, configuredPassword)) {
+      return res.status(401).json({ error: "Invalid admin email or password." });
+    }
+
+    adminLoginAttempts.delete(ip);
+    const payload = Buffer.from(JSON.stringify({ email: configuredEmail, exp: now + 8 * 60 * 60 * 1000 })).toString("base64url");
+    const signature = signAdminSession(payload, sessionSecret);
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Set-Cookie", `${adminSessionCookie}=${payload}.${signature}; Path=/api/admin; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`);
+    return res.status(200).json({ ok: true, user: { email: configuredEmail, role: "Admin" } });
+  });
+
+  app.get("/api/admin/session", (req, res) => {
+    const sessionSecret = process.env.PAK_TIJARAT_SESSION_SECRET;
+    const configuredEmail = process.env.PAK_TIJARAT_ADMIN_EMAIL?.trim().toLowerCase();
+    const token = readCookie(req.headers.cookie, adminSessionCookie);
+    if (!sessionSecret || !configuredEmail || !token) {
+      res.setHeader("Cache-Control", "no-store");
+      return res.status(401).json({ authenticated: false });
+    }
+    const splitAt = token.lastIndexOf(".");
+    if (splitAt < 1) return res.status(401).json({ authenticated: false });
+    const payload = token.slice(0, splitAt);
+    const signature = token.slice(splitAt + 1);
+    if (!safeEqual(signature, signAdminSession(payload, sessionSecret))) {
+      return res.status(401).json({ authenticated: false });
+    }
+    try {
+      const session = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+      if (session.email !== configuredEmail || typeof session.exp !== "number" || session.exp <= Date.now()) {
+        return res.status(401).json({ authenticated: false });
+      }
+      res.setHeader("Cache-Control", "no-store");
+      return res.json({ authenticated: true, user: { email: configuredEmail, role: "Admin" } });
+    } catch {
+      return res.status(401).json({ authenticated: false });
+    }
+  });
+
+  app.post("/api/admin/logout", (_req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Set-Cookie", `${adminSessionCookie}=; Path=/api/admin; HttpOnly; Secure; SameSite=Lax; Max-Age=0`);
+    return res.json({ ok: true });
   });
 
   // API Route for AI Insights
