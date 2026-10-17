@@ -21,10 +21,6 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks: (id: string) => {
-            // Firebase SDK — separate heavy chunk
-            if (id.includes('node_modules/firebase') || id.includes('node_modules/@firebase')) {
-              return 'firebase-sdk';
-            }
             // Recharts (charts library) — separate chunk
             if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-') || id.includes('node_modules/victory-')) {
               return 'charts';
