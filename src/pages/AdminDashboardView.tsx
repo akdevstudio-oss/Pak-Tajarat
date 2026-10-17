@@ -492,6 +492,7 @@ export const AdminDashboardView: React.FC = () => {
   const [newImageUrlInput, setNewImageUrlInput] = useState('');
   const productImageInputRef = useRef<HTMLInputElement | null>(null);
   const [imageUploadBusy, setImageUploadBusy] = useState(false);
+  const [failedImagePreviews, setFailedImagePreviews] = useState<string[]>([]);
 
   // Image Cropper & Live Preview Modal State
   const [cropperModalOpen, setCropperModalOpen] = useState(false);
@@ -533,6 +534,20 @@ export const AdminDashboardView: React.FC = () => {
           if (!result.url || !['http:', 'https:'].includes(new URL(result.url).protocol)) {
             throw new Error('The server did not return a valid public image URL.');
           }
+          // Confirm the returned R2/public URL can actually render before showing it as added.
+          await new Promise<void>((resolve, reject) => {
+            const preview = new window.Image();
+            const timeout = window.setTimeout(() => {
+              preview.src = '';
+              reject(new Error('Image uploaded, but its public URL did not respond in time. Check the R2 public/custom domain setting.'));
+            }, 12000);
+            preview.onload = () => { window.clearTimeout(timeout); resolve(); };
+            preview.onerror = () => {
+              window.clearTimeout(timeout);
+              reject(new Error('Image upload returned a URL, but the image cannot be displayed. Check the R2 public URL/domain and bucket access.'));
+            };
+            preview.src = result.url;
+          });
           uploadedList.push(result.url);
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Please try again.';
@@ -575,10 +590,18 @@ export const AdminDashboardView: React.FC = () => {
     try {
       await new Promise<void>((resolve, reject) => {
         const image = new window.Image();
-        image.onload = () => resolve();
-        image.onerror = () => reject(new Error('This URL did not load an image. Use a direct, publicly accessible image URL or upload the file instead.'));
+        const timeout = window.setTimeout(() => {
+          image.src = '';
+          reject(new Error('The image URL timed out. Use a direct, publicly accessible image URL.'));
+        }, 12000);
+        image.onload = () => { window.clearTimeout(timeout); resolve(); };
+        image.onerror = () => {
+          window.clearTimeout(timeout);
+          reject(new Error('This URL did not load an image. Use a direct, publicly accessible image URL or upload the file instead.'));
+        };
         image.src = parsedUrl.href;
       });
+      setFailedImagePreviews(prev => prev.filter(url => url !== parsedUrl.href));
       setPImages(prev => [...prev, parsedUrl.href]);
       if (!pImage) setPImage(parsedUrl.href);
       setNewImageUrlInput('');
@@ -2281,12 +2304,29 @@ export const AdminDashboardView: React.FC = () => {
                             <img 
                               src={imgUrl} 
                               alt={`Product image ${idx + 1}`} 
-                              className="w-full h-full object-contain p-1" 
+                              className={`w-full h-full object-contain p-1 ${failedImagePreviews.includes(imgUrl) ? 'hidden' : ''}`} 
                               referrerPolicy="no-referrer"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560343090-f0409e92791a?auto=format&fit=crop&w=300&q=80';
-                              }}
+                              onLoad={() => setFailedImagePreviews(prev => prev.filter(url => url !== imgUrl))}
+                              onError={() => setFailedImagePreviews(prev => prev.includes(imgUrl) ? prev : [...prev, imgUrl])}
                             />
+                            {failedImagePreviews.includes(imgUrl) && (
+                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-zinc-950 p-2 text-center">
+                                <Image size={20} className="text-amber-400" />
+                                <span className="text-[10px] font-bold text-amber-300">Image unavailable</span>
+                                <span className="text-[9px] text-zinc-500 break-words">Check public image URL / R2 access</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setFailedImagePreviews(prev => prev.filter(url => url !== imgUrl));
+                                    const image = new window.Image();
+                                    image.onload = () => setFailedImagePreviews(prev => prev.filter(url => url !== imgUrl));
+                                    image.onerror = () => setFailedImagePreviews(prev => prev.includes(imgUrl) ? prev : [...prev, imgUrl]);
+                                    image.src = imgUrl;
+                                  }}
+                                  className="rounded-md bg-zinc-800 px-2 py-1 text-[9px] text-white"
+                                >Retry preview</button>
+                              </div>
+                            )}
 
                             {/* Badge */}
                             {isMain && (
