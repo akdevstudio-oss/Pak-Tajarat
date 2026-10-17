@@ -132,6 +132,53 @@ type AdminTab =
   | 'cms-seo'
   | 'workers';
 
+
+const AdminPasswordChangePanel: React.FC = () => {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ok:boolean;text:string}|null>(null);
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setMessage(null);
+    if (newPassword.length < 12) { setMessage({ok:false,text:'New password must be at least 12 characters.'}); return; }
+    if (newPassword !== confirmPassword) { setMessage({ok:false,text:'New passwords do not match.'}); return; }
+    setBusy(true);
+    try {
+      const response = await fetch('/api/admin/change-password', {
+        method:'POST', credentials:'same-origin', cache:'no-store',
+        headers:{'Content-Type':'application/json',Accept:'application/json'},
+        body:JSON.stringify({currentPassword,newPassword})
+      });
+      const result = await response.json().catch(()=>({}));
+      if (!response.ok) throw new Error(result.error || 'Password could not be changed.');
+      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+      setMessage({ok:true,text:result.message || 'Password changed successfully.'});
+    } catch (error:any) { setMessage({ok:false,text:error?.message || 'Password could not be changed.'}); }
+    finally { setBusy(false); }
+  };
+  return (
+    <form onSubmit={submit} className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl space-y-4 max-w-2xl">
+      <div>
+        <h3 className="text-base font-bold text-white">Change Admin Password</h3>
+        <p className="text-xs text-zinc-400 mt-1">Enter your current password, then choose a new password with at least 12 characters.</p>
+      </div>
+      <label className="block text-xs font-semibold text-zinc-300">Current password
+        <input type="password" autoComplete="current-password" required value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-500" />
+      </label>
+      <label className="block text-xs font-semibold text-zinc-300">New password
+        <input type="password" autoComplete="new-password" minLength={12} maxLength={256} required value={newPassword} onChange={e=>setNewPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-500" />
+      </label>
+      <label className="block text-xs font-semibold text-zinc-300">Confirm new password
+        <input type="password" autoComplete="new-password" minLength={12} maxLength={256} required value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-500" />
+      </label>
+      {message && <p role="status" className={`rounded-xl border px-3 py-2 text-xs ${message.ok?'border-emerald-500/30 bg-emerald-500/10 text-emerald-300':'border-red-500/30 bg-red-500/10 text-red-300'}`}>{message.text}</p>}
+      <button disabled={busy} type="submit" className="rounded-xl bg-emerald-600 px-5 py-3 text-xs font-black text-white hover:bg-emerald-500 disabled:opacity-60">{busy?'Saving securely…':'Update Password'}</button>
+    </form>
+  );
+};
+
 export const AdminDashboardView: React.FC = () => {
   const {
     currentUser,
@@ -1998,18 +2045,15 @@ export const AdminDashboardView: React.FC = () => {
               <h2 className="text-xl font-black text-white">Administrator Security Profile</h2>
               <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl space-y-4 text-xs">
                 <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0F9D58] to-emerald-600 flex items-center justify-center font-black text-white text-xl">
-                    A
-                  </div>
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0F9D58] to-emerald-600 flex items-center justify-center font-black text-white text-xl">A</div>
                   <div>
                     <h3 className="text-lg font-bold text-white">Admin Manager</h3>
                     <p className="text-zinc-400">{currentUser?.email || '—'}</p>
-                    <span className="inline-block mt-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px]">
-                      Root Administrator
-                    </span>
+                    <span className="inline-block mt-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px]">Root Administrator</span>
                   </div>
                 </div>
               </div>
+              <AdminPasswordChangePanel />
             </div>
           )}
 
