@@ -531,7 +531,7 @@ export const AdminDashboardView: React.FC = () => {
           if (!file.type.startsWith('image/')) throw new Error(`${file.name}: please choose an image file.`);
           if (file.size > 15 * 1024 * 1024) throw new Error(`${file.name}: image must be 15 MB or smaller.`);
           const result = await optimizeAndUploadImage(file, 'products', 1600, 0.82);
-          if (!result.url || !['http:', 'https:'].includes(new URL(result.url).protocol)) {
+          if (!result.url || !['http:', 'https:'].includes(new URL(result.url, window.location.origin).protocol)) {
             throw new Error('The server did not return a valid public image URL.');
           }
           // Confirm the returned R2/public URL can actually render before showing it as added.

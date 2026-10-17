@@ -48,7 +48,18 @@ export async function optimizeAndUploadImage(
     let result: any = {};
     try { result = await response.json(); } catch {}
     if (!response.ok) throw new Error(result.error || 'Could not upload image to Cloudflare R2.');
-    return { url: result.url as string, path: result.key as string, size: optimizedBlob.size, type: optimizedBlob.type };
+    if (typeof result.url !== 'string' || !result.url.trim()) {
+      throw new Error('Image upload succeeded but the server did not return an image URL.');
+    }
+    // The R2 API intentionally returns a same-origin relative URL (/api/media-object?key=...).
+    // Resolve it to an absolute URL so previews and product cards can load it consistently.
+    let publicUrl: string;
+    try {
+      publicUrl = new URL(result.url, window.location.origin).href;
+    } catch {
+      throw new Error('The image server returned an invalid URL.');
+    }
+    return { url: publicUrl, path: result.key as string, size: optimizedBlob.size, type: optimizedBlob.type };
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
