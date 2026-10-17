@@ -94,11 +94,7 @@ export const AuthView: React.FC = () => {
       } catch (err: any) {
         console.error("Verification registration error:", err);
         let errMsg = err?.message || String(err);
-        if (errMsg.includes('admin-restricted-operation')) {
-          setAuthError('admin-restricted-operation');
-        } else {
-          setAuthError(errMsg);
-        }
+        setAuthError(errMsg);
         setShowOtpModal(false);
       } finally {
         setIsLoading(false);
@@ -212,28 +208,7 @@ export const AuthView: React.FC = () => {
             </p>
           </div>
 
-          {/* Auth Config Error Alert */}
-          {authError === 'admin-restricted-operation' && (
-            <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-2xl text-left text-xs text-red-800 dark:text-red-400 space-y-2">
-              <div className="flex items-center space-x-2 font-extrabold text-red-900 dark:text-red-300">
-                <AlertTriangle size={16} className="shrink-0 text-red-600 dark:text-red-400 animate-bounce" />
-                <span>Authentication Config Required</span>
-              </div>
-              <p className="leading-relaxed">
-                Firebase **Anonymous Authentication** is currently disabled in your Firebase console. To fix this:
-              </p>
-              <div className="pl-3 border-l-2 border-red-300 dark:border-red-800 space-y-1 text-[11px] text-red-700 dark:text-red-400">
-                <p>1. Open your <a href="https://console.firebase.google.com/" target="_blank" rel="noreferrer" className="underline font-bold hover:text-red-900 dark:hover:text-white">Firebase Console</a>.</p>
-                <p>2. Navigate to your project, then to <strong>Build &gt; Authentication &gt; Sign-in method</strong>.</p>
-                <p>3. Click <strong>Add new provider</strong>, select <strong>Anonymous</strong>, switch to **Enable**, and click <strong>Save</strong>.</p>
-              </div>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 pt-1">
-                *Alternatively, you can sign in instantly using the <strong>Continue with Google</strong> button below which is enabled by default!*
-              </p>
-            </div>
-          )}
-
-          {authError && authError !== 'admin-restricted-operation' && (
+          {authError && (
             <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-2xl text-left text-xs text-red-800 dark:text-red-400 flex items-start space-x-2">
               <AlertTriangle size={16} className="shrink-0 text-red-600 mt-0.5" />
               <div>
@@ -624,7 +599,7 @@ export const AuthView: React.FC = () => {
                 <div className="h-12 w-12 bg-emerald-100 dark:bg-emerald-950/30 text-[#0F9D58] rounded-full flex items-center justify-center mx-auto">
                   <CheckCircle2 size={28} />
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed">A simulated password reset link was dispatched to <strong>{forgotEmail}</strong>. Check your inbox or junk folder.</p>
+                <p className="text-xs text-gray-500 leading-relaxed">Self-service password reset is not available yet. Please use the Contact page to reach Pak-Tijarat support.</p>
                 <button
                   onClick={() => setShowForgotModal(false)}
                   className="w-full bg-[#0F9D58] hover:bg-[#0B7B44] text-white font-extrabold text-xs uppercase py-2.5 rounded-xl shadow-md cursor-pointer"
@@ -634,7 +609,7 @@ export const AuthView: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleForgotSubmit} className="space-y-4">
-                <p className="text-xs text-gray-400 leading-relaxed">Enter your registered email address. If reset email is not configured, the site will tell you clearly.</p>
+                <p className="text-xs text-gray-400 leading-relaxed">Self-service password reset is not configured yet. You can contact support for account recovery.</p>
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-400 font-bold uppercase block">Your Email</label>
                   <input
