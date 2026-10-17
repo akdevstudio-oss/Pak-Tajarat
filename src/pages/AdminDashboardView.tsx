@@ -159,9 +159,6 @@ export const AdminDashboardView: React.FC = () => {
     updatePromoBannerEnabled,
     heroBanners,
     updateHeroBanners,
-    adminEmail,
-    adminPassword,
-    updateAdminCredentials,
     blogs,
     addBlog,
     updateBlog,
@@ -266,10 +263,6 @@ export const AdminDashboardView: React.FC = () => {
     { id: 'm2', customer: 'Hamza Malik', email: 'hamza@example.com', subject: 'Affiliate Payout Time', date: '2026-07-20', status: 'Resolved', message: 'Hi, when will my JazzCash withdrawal request be processed?' },
     { id: 'm3', customer: 'Bilal Khan', email: 'bilal@example.com', subject: 'Sialkot Cricket Bat Warranty', date: '2026-07-19', status: 'Pending', message: 'Does the Grade A Sialkot bat come with 1 year replacement warranty?' }
   ]);
-
-  // Admin Security Settings
-  const [adminEmailInput, setAdminEmailInput] = useState(adminEmail || 'admin@paktajarat.pk');
-  const [adminPasswordInput, setAdminPasswordInput] = useState(adminPassword || 'admin123');
 
   // --- SECURITY CHECK (403 Access Denied) ---
   if (!currentUser || currentUser.role !== 'Admin') {
@@ -1987,28 +1980,12 @@ export const AdminDashboardView: React.FC = () => {
           {/* ========================================================= */}
           {activeTab === 'settings' && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <h2 className="text-xl font-black text-white">Platform Settings & Passkeys</h2>
-              <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl space-y-4 text-xs">
-                <h3 className="font-bold text-white">Admin Authentication Credentials</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-zinc-400 font-bold block mb-1">Admin Email</label>
-                    <input type="email" value={adminEmailInput} onChange={e => setAdminEmailInput(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-white" />
-                  </div>
-                  <div>
-                    <label className="text-zinc-400 font-bold block mb-1">Admin Passkey</label>
-                    <input type="password" value={adminPasswordInput} onChange={e => setAdminPasswordInput(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 text-white" />
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    updateAdminCredentials(adminEmailInput, adminPasswordInput);
-                    addNotification('Credentials Updated', 'Admin passkey saved successfully.', 'success');
-                  }}
-                  className="bg-[#0F9D58] text-white font-bold px-4 py-2 rounded-xl cursor-pointer"
-                >
-                  Save Passkey
-                </button>
+              <h2 className="text-xl font-black text-white">Platform Settings & Security</h2>
+              <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl space-y-3 text-sm">
+                <h3 className="font-bold text-white">Administrator Account</h3>
+                <p className="text-zinc-300">Signed in as <span className="font-semibold text-emerald-400">{currentUser?.email || 'Administrator'}</span></p>
+                <p className="text-zinc-400 leading-6">Admin credentials are verified on the server. Passwords entered in this browser-only panel would not change the real login password, so password editing is disabled here rather than showing a false success message.</p>
+                <p className="text-zinc-400 leading-6">To change the production password for now, update <code className="text-emerald-300">PAK_TIJARAT_ADMIN_PASSWORD</code> in Vercel → Project Settings → Environment Variables, then redeploy production.</p>
               </div>
             </div>
           )}
@@ -2026,7 +2003,7 @@ export const AdminDashboardView: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white">Admin Manager</h3>
-                    <p className="text-zinc-400">{adminEmail}</p>
+                    <p className="text-zinc-400">{currentUser?.email || '—'}</p>
                     <span className="inline-block mt-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px]">
                       Root Administrator
                     </span>
