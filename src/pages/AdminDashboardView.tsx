@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { optimizeAndUploadImage } from '../utils/imageOptimizer';
 import { useApp } from '../context/AppContext';
 import { Product, Order, CATEGORIES, BlogPost, Coupon, Review, Affiliate } from '../shared/types';
@@ -490,6 +490,8 @@ export const AdminDashboardView: React.FC = () => {
   };
 
   const [newImageUrlInput, setNewImageUrlInput] = useState('');
+  const productImageInputRef = useRef<HTMLInputElement | null>(null);
+  const [imageUploadBusy, setImageUploadBusy] = useState(false);
 
   // Image Cropper & Live Preview Modal State
   const [cropperModalOpen, setCropperModalOpen] = useState(false);
@@ -518,39 +520,75 @@ export const AdminDashboardView: React.FC = () => {
   };
 
   const handleMultiFileUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0 || imageUploadBusy) return;
+    setImageUploadBusy(true);
     const uploadedList: string[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      try {
-        const result = await optimizeAndUploadImage(file, 'products', 1600, 0.82);
-        if (!result.url) throw new Error('The server did not return an image URL.');
-        uploadedList.push(result.url);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Please try again.';
-        console.warn('Product image upload failed:', message);
-        addNotification('Image Upload Failed', message, 'warning');
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        try {
+          if (!file.type.startsWith('image/')) throw new Error(`${file.name}: please choose an image file.`);
+          if (file.size > 15 * 1024 * 1024) throw new Error(`${file.name}: image must be 15 MB or smaller.`);
+          const result = await optimizeAndUploadImage(file, 'products', 1600, 0.82);
+          if (!result.url || !['http:', 'https:'].includes(new URL(result.url).protocol)) {
+            throw new Error('The server did not return a valid public image URL.');
+          }
+          uploadedList.push(result.url);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Please try again.';
+          console.warn('Product image upload failed:', message);
+          addNotification('Image Upload Failed', message, 'warning');
+        }
       }
-    }
 
-    if (uploadedList.length > 0) {
-      setPImages(prev => {
-        const updated = [...prev, ...uploadedList];
-        return updated;
-      });
-
-      if (!pImage) setPImage(uploadedList[0]);
-      addNotification('Images Uploaded', `${uploadedList.length} product image(s) optimized and uploaded successfully!`, 'success');
+      if (uploadedList.length > 0) {
+        setPImages(prev => [...prev, ...uploadedList]);
+        if (!pImage) setPImage(uploadedList[0]);
+        addNotification('Images Uploaded', `${uploadedList.length} image(s) optimized and uploaded successfully.`, 'success');
+      }
+    } finally {
+      setImageUploadBusy(false);
+      if (productImageInputRef.current) productImageInputRef.current.value = '';
     }
   };
 
-  const handleAddImageUrl = () => {
-    if (!newImageUrlInput.trim()) return;
-    const url = newImageUrlInput.trim();
-    setPImages(prev => [...prev, url]);
-    if (!pImage) setPImage(url);
-    setNewImageUrlInput('');
-    addNotification('Image Added', 'Image URL added to product gallery.', 'success');
+  const handleAddImageUrl = async () => {
+    const rawUrl = newImageUrlInput.trim();
+    if (!rawUrl) {
+      addNotification('Image URL Required', 'Paste a direct image URL first.', 'warning');
+      return;
+    }
+
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(rawUrl);
+    } catch {
+      addNotification('Invalid Image URL', 'Enter a complete image URL beginning with https:// or http://.', 'error');
+      return;
+    }
+    if (!['https:', 'http:'].includes(parsedUrl.protocol)) {
+      addNotification('Invalid Image URL', 'Only http:// and https:// image URLs are supported.', 'error');
+      return;
+    }
+
+    setImageUploadBusy(true);
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const image = new window.Image();
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error('This URL did not load an image. Use a direct, publicly accessible image URL or upload the file instead.'));
+        image.src = parsedUrl.href;
+      });
+      setPImages(prev => [...prev, parsedUrl.href]);
+      if (!pImage) setPImage(parsedUrl.href);
+      setNewImageUrlInput('');
+      addNotification('Image Added', 'Image URL checked successfully and added to the gallery.', 'success');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'The image URL could not be verified.';
+      addNotification('Image URL Failed', message, 'error');
+    } finally {
+      setImageUploadBusy(false);
+    }
   };
 
   const handleRemoveImage = (indexToRemove: number) => {
@@ -2182,17 +2220,27 @@ export const AdminDashboardView: React.FC = () => {
 
                 {/* Upload Buttons Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className="flex items-center justify-center space-x-2 bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-600/40 border-dashed rounded-xl p-3 cursor-pointer transition-all text-emerald-300 font-bold text-xs">
-                    <Plus size={16} />
-                    <span>Upload Multiple Files (کمپیوٹر / موبائل سے لیں)</span>
+                  <div className="space-y-2">
                     <input
+                      ref={productImageInputRef}
                       type="file"
-                      accept="image/*"
+                      accept="image/*,.jpg,.jpeg,.png,.webp,.avif"
                       multiple
-                      className="hidden"
-                      onChange={(e) => handleMultiFileUpload(e.target.files)}
+                      className="sr-only"
+                      aria-label="Choose product image files"
+                      onChange={(e) => { void handleMultiFileUpload(e.target.files); }}
                     />
-                  </label>
+                    <button
+                      type="button"
+                      disabled={imageUploadBusy}
+                      onClick={() => productImageInputRef.current?.click()}
+                      className="w-full flex items-center justify-center space-x-2 bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-600/40 border-dashed rounded-xl p-3 cursor-pointer transition-all text-emerald-300 font-bold text-xs disabled:opacity-60 disabled:cursor-wait"
+                    >
+                      <Plus size={16} />
+                      <span>{imageUploadBusy ? 'Checking / uploading image…' : 'Choose Images (کمپیوٹر / موبائل سے لیں)'}</span>
+                    </button>
+                    <p className="text-[10px] text-zinc-500">JPG, PNG, WebP or AVIF · Maximum 15 MB per image. Images are converted to WebP before upload.</p>
+                  </div>
 
                   <div className="flex space-x-2">
                     <input
@@ -2204,10 +2252,11 @@ export const AdminDashboardView: React.FC = () => {
                     />
                     <button
                       type="button"
-                      onClick={handleAddImageUrl}
-                      className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-3 py-2.5 rounded-xl text-xs shrink-0 cursor-pointer"
+                      disabled={imageUploadBusy}
+                      onClick={() => { void handleAddImageUrl(); }}
+                      className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-3 py-2.5 rounded-xl text-xs shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                     >
-                      Add URL
+                      {imageUploadBusy ? 'Checking…' : 'Add URL'}
                     </button>
                   </div>
                 </div>
