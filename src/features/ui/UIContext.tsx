@@ -3,7 +3,7 @@ import {
   ActiveView, Product, AppNotification, LogoConfig, SiteBrandingConfig, 
   CategoryItem, MediaItem, SeoConfig, HeroBanner, BlogPost, WorkerAccount 
 } from '../../shared/types';
-import { DEFAULT_BRANDING_CONFIG, DEFAULT_SITE_CATEGORIES, DEFAULT_SEO_CONFIG, DEFAULT_HERO_BANNERS, INITIAL_BLOGS } from '../../data/initialData';
+import { DEFAULT_BRANDING_CONFIG, DEFAULT_SITE_CATEGORIES, DEFAULT_SEO_CONFIG } from '../../data/initialData';
 import { applySeoAndBrandingToHead } from '../../utils/seoManager';
 import { getInitialRoute } from '../../utils/seo';
 
@@ -167,17 +167,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     try { const saved = localStorage.getItem('pak_tajarat_media_library'); return saved ? JSON.parse(saved) : []; } catch { return []; }
   });
   const [seoConfig, setSeoConfig] = useState<SeoConfig>(DEFAULT_SEO_CONFIG);
-  const [heroBanners, setHeroBanners] = useState<HeroBanner[]>(DEFAULT_HERO_BANNERS);
-  const [blogs, setBlogs] = useState<BlogPost[]>(() => {
-    try {
-      const saved = localStorage.getItem('pak_tajarat_blogs');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (_) {}
-    return INITIAL_BLOGS;
-  });
+  const [heroBanners, setHeroBanners] = useState<HeroBanner[]>([]);
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [promoBannerEnabled, setPromoBannerEnabled] = useState<boolean>(true);
 
   // Global Header Search State
@@ -197,25 +188,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   });
 
   // Worker Accounts State
-  const [workerAccounts, setWorkerAccounts] = useState<WorkerAccount[]>(() => {
-    try {
-      const saved = localStorage.getItem('pak_tajarat_worker_accounts');
-      if (saved) return JSON.parse(saved);
-    } catch (_) {}
-    return [
-      {
-        id: 'WRK-1001',
-        workerName: 'Ali Worker',
-        workerEmail: 'worker@paktajarat.pk',
-        workerPasskey: 'worker123',
-        role: 'Worker',
-        allowedModules: ['products', 'blogs'],
-        status: 'active',
-        createdAt: new Date().toISOString(),
-        assignedBy: 'Master Admin'
-      }
-    ];
-  });
+  const [workerAccounts, setWorkerAccounts] = useState<WorkerAccount[]>([]);
 
   // Theme effect
   useEffect(() => {
@@ -245,7 +218,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   // SEO & Head application effect
   useEffect(() => {
     applySeoAndBrandingToHead(seoConfig, brandingConfig);
-  }, [seoConfig, brandingConfig]);
+  }, [seoConfig, brandingConfig, currentView, selectedProductId]);
 
   // Load cloud-managed CMS content from MongoDB, keeping cached settings as a fallback.
   useEffect(() => {
@@ -269,7 +242,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       .then(result => {
         if (!active || !Array.isArray(result?.items)) return;
         setBlogs(result.items);
-        try { localStorage.setItem('pak_tajarat_blogs', JSON.stringify(result.items)); } catch {}
+
       })
       .catch(error => console.warn('MongoDB blogs fetch unavailable; using local cache.', error));
     fetch('/api/cms/media', { cache: 'no-store' })
@@ -285,7 +258,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       .then(result => {
         if (!active || !Array.isArray(result?.items)) return;
         setWorkerAccounts(result.items);
-        try { localStorage.setItem('pak_tajarat_worker_accounts', JSON.stringify(result.items)); } catch {}
+
       })
       .catch(() => {});
     return () => { active = false; };
