@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   const registerWithPassword = async (email: string, password?: string, fullName?: string, phone?: string) => registerUser(email, fullName || email.split('@')[0], phone || '', password);
   const sendPasswordReset = async (_email: string) => { throw new Error('Password reset email is not configured yet. Please contact support; no reset email was sent.'); };
-  const loginWithGoogle = async () => { throw new Error('Google sign-in was removed with Firebase. Use email and password to sign in.'); };
+  const loginWithGoogle = async () => { throw new Error('Google sign-in is not configured yet. Please use email and password to sign in.'); };
   const loginAnonymously = async () => {
     const guest: User = { id: 'guest-' + crypto.randomUUID(), email: 'guest@paktajarat.pk', fullName: 'Pak Shopper (Guest)', role: 'User', addresses: [], phone: '' };
     setCurrentUser(guest); addNotification('Guest Mode Activated', 'Browsing as guest.', 'success');
