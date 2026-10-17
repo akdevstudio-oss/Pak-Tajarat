@@ -60,7 +60,7 @@ export function applySeoAndBrandingToHead(
   // Use one production host to avoid duplicate www/non-www URLs.
   const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
   const configuredCanonical = seoConfig?.canonicalUrl?.trim();
-  let canonicalUrl = `https://pak-tajarat.store${pathname}\`;
+  let canonicalUrl = 'https://pak-tajarat.store' + pathname;
   if (configuredCanonical) {
     try {
       const configured = new URL(configuredCanonical);
