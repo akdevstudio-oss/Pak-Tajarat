@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { 
   Mail, Lock, User, Phone, LogIn, ChevronRight, CheckCircle2, 
   Shield, AlertTriangle, ShieldCheck, TrendingUp, Award, Sparkles,
-  Building2, HelpCircle, ArrowRight, Terminal, RefreshCw, Key, Check
+  Building2, HelpCircle, ArrowRight, RefreshCw, Check
 } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import { motion, AnimatePresence } from 'motion/react';
@@ -31,7 +31,6 @@ export const AuthView: React.FC = () => {
   // Error and Loading states
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSandboxHint, setShowSandboxHint] = useState(true);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,18 +150,6 @@ export const AuthView: React.FC = () => {
     }
   };
 
-  const fillCredentials = async (type: 'admin' | 'buyer') => {
-    if (type === 'admin') {
-      setEmail('admin@paktajarat.pk');
-      setPassword('admin123');
-      addNotification('Developer Sandbox', 'Admin credentials autofilled. Click Sign In.', 'info');
-    } else {
-      setEmail('buyer@paktajarat.pk');
-      setPassword('buyer123');
-      addNotification('Developer Sandbox', 'Buyer credentials autofilled. Click Sign In.', 'info');
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-stretch bg-[#0a0a0c] font-sans overflow-hidden" id="auth-view-container">
       
@@ -243,41 +230,6 @@ export const AuthView: React.FC = () => {
               Sign Up
             </button>
           </div>
-
-          {/* FAST SANDBOX TESTING DEV PORTAL */}
-          {activeTab === 'login' && showSandboxHint && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl text-left text-xs"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-2 font-black text-[#0F9D58]">
-                  <Terminal size={14} />
-                  <span>Developer Sandbox Autofill</span>
-                </div>
-                <button 
-                  onClick={() => setShowSandboxHint(false)}
-                  className="text-[10px] text-gray-400 hover:text-gray-200 hover:underline cursor-pointer"
-                >
-                  Dismiss
-                </button>
-              </div>
-              <p className="text-[11px] text-emerald-400 mb-3 leading-relaxed">
-                Click below to immediately autofill a shopper test account profile.
-              </p>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => fillCredentials('buyer')}
-                  className="w-full px-3 py-2 bg-zinc-900 border border-emerald-500/30 hover:border-[#0F9D58] hover:bg-[#0F9D58]/10 text-zinc-300 text-[10px] font-extrabold rounded-xl cursor-pointer transition-all text-center flex items-center justify-center space-x-1.5"
-                >
-                  <Key size={11} className="text-[#0F9D58]" />
-                  <span>Autofill Shopper Profile (Buyer)</span>
-                </button>
-              </div>
-            </motion.div>
-          )}
 
           {/* SOCIAL LOGINS */}
           <div className="grid grid-cols-2 gap-3">
