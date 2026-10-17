@@ -121,7 +121,7 @@ export const AffiliatePortalView: React.FC = () => {
 
   // Referred orders derived list
   // Do not display fabricated referral orders; show only records returned by the affiliate API.
-  const referredOrdersList = useMemo(() => [], []);
+  const referredOrdersList = useMemo<Array<{ id: string; productName: string; quantity: number; customerMasked: string; orderValue: number; commission: number; status: string; deliveryDate: string }>>(() => [], []);
 
   // Filtered orders list
   const filteredReferredOrders = useMemo(() => {
