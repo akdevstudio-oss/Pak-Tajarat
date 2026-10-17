@@ -20,6 +20,8 @@ export default async function handler(req:Req,res:ServerResponse){
   }
   if(req.method==="POST"){
     const body=req.body&&typeof req.body==="object"?req.body:{};
+    const requestedPaymentMethod=String(body.paymentMethod||"Cash on Delivery").trim();
+    if(requestedPaymentMethod!=="Cash on Delivery")return json(res,400,{ok:false,error:"Only Cash on Delivery is currently enabled. Online payments must be configured and verified before use."});
     const rawItems=Array.isArray(body.items)?body.items:[];
     if(!rawItems.length||rawItems.length>50)return json(res,400,{ok:false,error:"Cart is empty or has too many items."});
     const products=db.collection("products");
@@ -45,6 +47,7 @@ export default async function handler(req:Req,res:ServerResponse){
       if(!coupon)return json(res,400,{ok:false,error:"Coupon is invalid or expired."});
       if(coupon.minSpend&&subtotal<Number(coupon.minSpend))return json(res,400,{ok:false,error:"Minimum spend for this coupon has not been reached."});
       if(coupon.isActive===false||coupon.active===false)return json(res,400,{ok:false,error:"This coupon is inactive."});
+      if(coupon.expiryDate){const expiry=Date.parse(String(coupon.expiryDate));if(Number.isFinite(expiry)&&expiry<Date.now())return json(res,400,{ok:false,error:"Coupon has expired."});}
       const amount=Number(coupon.discount)||0;
       requestedDiscount=String(coupon.type||"").toLowerCase()==="fixed"?amount:subtotal*amount/100;
       requestedDiscount=Math.max(0,Math.min(requestedDiscount,subtotal));
