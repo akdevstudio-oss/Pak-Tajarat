@@ -547,7 +547,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setWorkerAccounts(prev => {
       const updated = [...prev.filter(w => w.id !== newWorker.id), newWorker];
       try {
-        localStorage.setItem('pak_tajarat_worker_accounts', JSON.stringify(updated));
+
       } catch (_) {}
       return updated;
     });
@@ -563,7 +563,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setWorkerAccounts(prev => {
       const updated = prev.map(w => w.id === workerId ? { ...w, status } : w);
       try {
-        localStorage.setItem('pak_tajarat_worker_accounts', JSON.stringify(updated));
+
       } catch (_) {}
       return updated;
     });
@@ -579,7 +579,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setWorkerAccounts(prev => {
       const updated = prev.filter(w => w.id !== workerId);
       try {
-        localStorage.setItem('pak_tajarat_worker_accounts', JSON.stringify(updated));
+
       } catch (_) {}
       return updated;
     });
@@ -595,7 +595,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setWorkerAccounts(prev => {
       const updated = prev.map(w => w.id === workerId ? { ...w, workerPasskey: newPasskey } : w);
       try {
-        localStorage.setItem('pak_tajarat_worker_accounts', JSON.stringify(updated));
+
       } catch (_) {}
       return updated;
     });
