@@ -1,12 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0F9D58" />
-      <stop offset="100%" stop-color="#0B1B3D" />
-    </linearGradient>
-  </defs>
-  <!-- Beautiful Hexagonal/Star Shape -->
-  <path d="M50 5 L88 27 L88 73 L50 95 L12 73 L12 27 Z" fill="url(#logo-grad)" />
-  <!-- Inner P and T monogram style in White -->
-  <text x="50" y="65" font-family="system-ui, sans-serif" font-size="45" font-weight="900" fill="#FFFFFF" text-anchor="middle">PT</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Pak-Tijarat logo</title>
+  <rect width="512" height="512" rx="256" fill="#fff"/>
+  <circle cx="256" cy="256" r="235" fill="none" stroke="#14243f" stroke-width="10"/>
+  <circle cx="256" cy="256" r="222" fill="none" stroke="#c9a18e" stroke-width="3"/>
+  <path d="M113 356 C148 314 161 264 177 201 C187 161 213 126 260 112 C303 99 344 116 367 147" fill="none" stroke="#14243f" stroke-width="10" stroke-linecap="round"/>
+  <text x="245" y="315" font-family="Georgia,serif" font-size="246" font-weight="bold" text-anchor="middle" fill="#14243f">P</text>
+  <text x="298" y="354" font-family="Georgia,serif" font-size="238" font-weight="bold" text-anchor="middle" fill="#c99b86">T</text>
+  <path d="M120 392 H392" stroke="#14243f" stroke-width="4"/>
+  <text x="256" y="425" font-family="Georgia,serif" font-size="32" letter-spacing="3" text-anchor="middle" fill="#14243f">PAK-TIJARAT</text>
 </svg>
