@@ -29,7 +29,7 @@ const handlers: Record<string, (req: any, res: ServerResponse) => unknown> = {
   "auth/logout": authLogout, "auth/profile": authProfile, "auth/session": authSession,
   "cms": cmsCollection, "db-health": dbHealth, "media-object": mediaObject,
   "media/delete": mediaDelete, "media/upload": mediaUpload, "orders": ordersHandler, "products": productIndex,
-  "products/clear": productClear, "r2/health": r2Health,
+  "products/[id]": productItem, "products/clear": productClear, "r2/health": r2Health,
 };
 export const config = { api: { bodyParser: false } };
 
