@@ -62,14 +62,21 @@ export const AuthView: React.FC = () => {
     }
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !fullName || !password) return;
-
-    setPendingUserReg({ email, fullName, phone });
-    setShowOtpModal(true);
+    if (!email.trim() || !fullName.trim() || !password) return;
+    setIsLoading(true);
     setAuthError(null);
-    addNotification('OTP Verification Sent', 'Simulated 4-digit verification code sent to your email.', 'info');
+    try {
+      await registerUser(email.trim(), fullName.trim(), phone.trim(), password);
+      addNotification('Account Created', 'Your account has been created successfully.', 'success');
+      setActiveTab('login');
+      setCurrentView('home');
+    } catch (err: any) {
+      setAuthError(err?.message || 'Account registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -107,7 +114,8 @@ export const AuthView: React.FC = () => {
         await sendPasswordReset(forgotEmail.trim());
         setForgotSuccess(true);
       } catch (err: any) {
-        console.error("Forgot password error:", err);
+        setAuthError(err?.message || 'Password reset is unavailable. Please contact support.');
+        setForgotSuccess(false);
       } finally {
         setIsLoading(false);
       }
@@ -126,8 +134,8 @@ export const AuthView: React.FC = () => {
         setCurrentView('home');
       }
     } catch (err: any) {
-      console.warn("Google sign in warning (non-fatal):", err);
-      setCurrentView('home');
+      console.warn("Google sign in is unavailable:", err);
+      setAuthError(err?.message || 'Google sign-in is not configured. Please use email and password.');
     } finally {
       setIsLoading(false);
     }
@@ -626,7 +634,7 @@ export const AuthView: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleForgotSubmit} className="space-y-4">
-                <p className="text-xs text-gray-400 leading-relaxed">Enter your registered enterprise email address and we'll send a simulated recovery key.</p>
+                <p className="text-xs text-gray-400 leading-relaxed">Enter your registered email address. If reset email is not configured, the site will tell you clearly.</p>
                 <div className="space-y-1">
                   <label className="text-[10px] text-gray-400 font-bold uppercase block">Your Email</label>
                   <input
@@ -669,7 +677,7 @@ export const AuthView: React.FC = () => {
           >
             <h3 className="font-extrabold text-gray-900 dark:text-white text-base">Security OTP Verification</h3>
             <p className="text-xs text-gray-500 leading-relaxed">
-              We have sent a simulated verification code to <strong>{pendingUserReg.email}</strong>. For quick testing, type any 4-digit code (e.g. <strong className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded text-gray-700 dark:text-zinc-300">1234</strong>) below.
+              This email verification flow is not enabled. Please use the registration form to create your account.
             </p>
 
             <form onSubmit={handleVerifyOtp} className="space-y-4">
