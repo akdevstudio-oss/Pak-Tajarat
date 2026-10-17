@@ -73,10 +73,7 @@ export interface UIContextType {
   isRomanEnglish: boolean;
   setIsRomanEnglish: (enabled: boolean) => void;
 
-  // Admin Credentials
-  adminEmail: string;
-  adminPassword?: string;
-  updateAdminCredentials: (email: string, password: string) => Promise<void>;
+  // Admin identity is read from the authenticated server session.
 
   // Blog Management
   blogs: BlogPost[];
@@ -190,16 +187,6 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setCurrentViewState('products');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
-
-  // Admin Credentials
-  const [adminEmail, setAdminEmailState] = useState<string>(() => {
-    return localStorage.getItem('pak_tajarat_adminEmail') || 'admin@paktajarat.pk';
-  });
-  const [adminPassword, setAdminPasswordState] = useState<string>(() => {
-    // NOTE: We store only a hashed indicator, never plaintext in production.
-    // This is used only for local demo worker login comparison.
-    return sessionStorage.getItem('pak_tajarat_adminPassword') || '';
-  });
 
   // Multilingual SEO Language
   const [seoLang, setSeoLangState] = useState<'en' | 'ur' | 'roman'>(() => {
@@ -504,15 +491,6 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
   };
 
-  const updateAdminCredentials = async (email: string, pass: string) => {
-    setAdminEmailState(email);
-    setAdminPasswordState(pass);
-    localStorage.setItem('pak_tajarat_adminEmail', email);
-    // Store password only in sessionStorage (not localStorage) to avoid plaintext persistence
-    sessionStorage.setItem('pak_tajarat_adminPassword', pass);
-    addNotification('Admin Credentials Saved 🔑', 'Master Admin login credentials updated.', 'success');
-  };
-
   const cleanUndefinedProps = (obj: any): any => {
     if (obj === null || obj === undefined) return null;
     if (typeof obj !== 'object') return obj;
@@ -673,7 +651,6 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       heroBanners, updateHeroBanners,
       headerSearchQuery, setHeaderSearchQuery, executeGlobalSearch,
       seoLang, setSeoLang, isRomanEnglish, setIsRomanEnglish,
-      adminEmail, adminPassword, updateAdminCredentials,
       blogs, addBlog, updateBlog, deleteBlog,
       workerAccounts, addWorkerAccount, updateWorkerAccountStatus, deleteWorkerAccount, updateWorkerAccountPassword
     }}>
