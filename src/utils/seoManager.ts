@@ -56,16 +56,25 @@ export function applySeoAndBrandingToHead(
   setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', seoConfig?.ogDescription || seoConfig?.metaDescription);
   setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', seoConfig?.twitterImage || brandingConfig?.ogImageUrl || brandingConfig?.defaultSeoImageUrl);
 
-  const canonicalUrl = seoConfig?.canonicalUrl?.trim();
-  if (canonicalUrl) {
-    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.rel = 'canonical';
-      document.head.appendChild(canonical);
-    }
-    canonical.href = canonicalUrl;
+  // Canonicals must follow the active SPA route, not remain stuck on the homepage.
+  // Use one production host to avoid duplicate www/non-www URLs.
+  const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+  const configuredCanonical = seoConfig?.canonicalUrl?.trim();
+  let canonicalUrl = `https://pak-tajarat.store${pathname}\`;
+  if (configuredCanonical) {
+    try {
+      const configured = new URL(configuredCanonical);
+      const configuredPath = configured.pathname.replace(/\/+$/, '') || '/';
+      if (configuredPath === pathname) canonicalUrl = configured.toString();
+    } catch { /* fall back to the normalized route URL */ }
   }
+  let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    document.head.appendChild(canonical);
+  }
+  canonical.href = canonicalUrl;
 
   if (brandingConfig?.faviconUrl) forceUpdateFavicon(brandingConfig.faviconUrl);
 }
