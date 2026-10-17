@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { createAdminToken, setAdminCookie } from "../../admin-session.js";
-import { getDatabase } from "../mongodb-server.js";
+import { getDatabase } from "../../mongodb-server.js";
 import { verifyAdminPassword } from "../../admin-password.js";
 type Request = IncomingMessage & { body?: any };
 function json(res: ServerResponse, status: number, body: unknown) { res.statusCode=status; res.setHeader("Content-Type","application/json; charset=utf-8"); res.end(JSON.stringify(body)); }
