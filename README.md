@@ -43,8 +43,8 @@ npm run lint
 Configure MongoDB and Cloudflare R2 credentials as environment variables in the hosting dashboard. Keep all access keys server-side. The public website must never receive R2 secret keys or database credentials.
 
 ## Important deployment notes
-- This repository's migration work is developed on the `remove-firebase-add-mongodb-r2` branch; production `main` is kept separate until migration checks pass.
-- The application must be tested against real configured MongoDB and R2 credentials before launch.
+- The production `main` branch contains the server-side MongoDB health endpoint and the R2 media integration.
+- The application must be tested against real configured MongoDB and R2 credentials before launch; environment-variable presence alone does not confirm the services are reachable.
 - Storage usage checks require the R2 credentials to have permission to list bucket objects, in addition to read/write/delete permissions required by the app.
 - No paid hosting or add-on upgrade is required as part of these code changes. Provider usage, quotas, and billing are controlled by the account and provider plan.
 
