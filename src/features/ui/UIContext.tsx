@@ -261,6 +261,24 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
       })
       .catch(() => {});
+    fetch('/api/cms/categories?id=categories', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (active && Array.isArray(result?.item?.items)) setSiteCategories(result.item.items);
+      })
+      .catch(() => {});
+    fetch('/api/cms/seo?id=seo', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (active && result?.item) setSeoConfig({ ...DEFAULT_SEO_CONFIG, ...result.item });
+      })
+      .catch(() => {});
+    fetch('/api/cms/hero_banners?id=hero_banners', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (active && Array.isArray(result?.item?.items)) setHeroBanners(result.item.items);
+      })
+      .catch(() => {});
     return () => { active = false; };
   }, []);
 
@@ -369,8 +387,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const updateSiteCategories = async (categories: CategoryItem[]) => {
+    await persistCms('categories', 'categories', 'PUT', { id: 'categories', items: categories });
     setSiteCategories(categories);
-    addNotification('Categories Updated 📁', 'Site category configuration updated.', 'success');
+    addNotification('Categories Updated 📁', 'Categories saved to MongoDB.', 'success');
   };
 
   const addMediaItem = async (item: MediaItem) => {
@@ -419,8 +438,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const updateSeoConfig = async (config: Partial<SeoConfig>) => {
     const updated = { ...seoConfig, ...config };
+    await persistCms('seo', 'seo', 'PUT', { id: 'seo', ...updated });
     setSeoConfig(updated);
-    addNotification('SEO Config Updated 🚀', 'Global SEO parameters updated.', 'success');
+    addNotification('SEO Config Updated 🚀', 'SEO settings saved to MongoDB.', 'success');
   };
 
   const updatePromoBannerEnabled = async (enabled: boolean) => {
@@ -428,8 +448,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const updateHeroBanners = async (banners: HeroBanner[]) => {
+    await persistCms('hero_banners', 'hero_banners', 'PUT', { id: 'hero_banners', items: banners });
     setHeroBanners(banners);
-    addNotification('Banners Updated 🖼️', 'Hero banners updated successfully.', 'success');
+    addNotification('Banners Updated 🖼️', 'Hero banners saved to MongoDB.', 'success');
   };
 
   const setIsRomanEnglish = (enabled: boolean) => {
