@@ -163,9 +163,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     return DEFAULT_BRANDING_CONFIG;
   });
   const [siteCategories, setSiteCategories] = useState<CategoryItem[]>(DEFAULT_SITE_CATEGORIES);
-  const [mediaLibrary, setMediaLibrary] = useState<MediaItem[]>(() => {
-    try { const saved = localStorage.getItem('pak_tajarat_media_library'); return saved ? JSON.parse(saved) : []; } catch { return []; }
-  });
+  const [mediaLibrary, setMediaLibrary] = useState<MediaItem[]>([]);
   const [seoConfig, setSeoConfig] = useState<SeoConfig>(DEFAULT_SEO_CONFIG);
   const [heroBanners, setHeroBanners] = useState<HeroBanner[]>([]);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
@@ -250,7 +248,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       .then(result => {
         if (!active || !Array.isArray(result?.items)) return;
         setMediaLibrary(result.items);
-        try { localStorage.setItem('pak_tajarat_media_library', JSON.stringify(result.items)); } catch {}
+
       })
       .catch(() => {});
     fetch('/api/cms/worker_accounts', { cache: 'no-store' })
@@ -355,9 +353,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const updateBrandingConfig = async (config: Partial<SiteBrandingConfig>) => {
     const updated: SiteBrandingConfig = { ...brandingConfig, ...config };
+    await persistCms('branding', 'branding', 'PUT', { ...updated, id: 'branding' });
     setBrandingConfig(updated);
-
-    // Keep logoConfig aligned
     setLogoConfig(prev => ({
       ...prev,
       logoImageUrl: updated.logoImageUrl !== undefined ? (updated.logoImageUrl || '') : prev.logoImageUrl,
@@ -365,25 +362,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       customText: updated.customText || prev.customText,
       faviconUrl: updated.faviconUrl !== undefined ? (updated.faviconUrl || '') : prev.faviconUrl
     }));
-
-    // 1. Immediately cache in localStorage for instant offline & zero-lag reload persistence
-    try {
-      localStorage.setItem('pak_tajarat_branding_config', JSON.stringify(updated));
-    } catch (e) {
-      console.warn("LocalStorage branding save warning:", e);
-    }
-
-    // 2. Force immediate DOM head update (tab favicon, apple touch icon, title)
+    try { localStorage.setItem('pak_tajarat_branding_config', JSON.stringify(updated)); } catch {}
     applySeoAndBrandingToHead(seoConfig, updated);
-
-    // 3. Persist permanently to Cloud Firestore
-    try {
-      await persistCms('branding', 'branding', 'PUT', { ...updated, id: 'branding' });
-    } catch (err) {
-      console.error("MongoDB branding save error:", err);
-    }
-
-    addNotification('Branding Updated 🎨', 'Branding & favicon permanently saved.', 'success');
+    addNotification('Branding Updated 🎨', 'Branding and favicon saved to MongoDB.', 'success');
   };
 
   const updateSiteCategories = async (categories: CategoryItem[]) => {
@@ -393,23 +374,14 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const addMediaItem = async (item: MediaItem) => {
-    setMediaLibrary(prev => {
-      const updated = [item, ...prev.filter(m => m.id !== item.id)];
-      try { localStorage.setItem('pak_tajarat_media_library', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
-    try { await persistCms('media', item.id, 'PUT', item); }
-    catch (error) { console.warn('Could not save media metadata to MongoDB:', error); }
-    addNotification('Media Added 🖼️', `Media file ${item.name} uploaded.`, 'success');
+    await persistCms('media', item.id, 'PUT', item);
+    setMediaLibrary(prev => [item, ...prev.filter(m => m.id !== item.id)]);
+    addNotification('Media Added 🖼️', `Media file ${item.name} uploaded and saved.`, 'success');
   };
 
   const updateMediaItem = async (item: MediaItem) => {
-    setMediaLibrary(prev => {
-      const updated = prev.map(m => m.id === item.id ? item : m);
-      try { localStorage.setItem('pak_tajarat_media_library', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
     await persistCms('media', item.id, 'PUT', item);
+    setMediaLibrary(prev => prev.map(m => m.id === item.id ? item : m));
   };
 
   const deleteMediaItem = async (id: string) => {
@@ -428,11 +400,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     } else {
       await persistCms('media', id, 'DELETE');
     }
-    setMediaLibrary(prev => {
-      const updated = prev.filter(m => m.id !== id);
-      try { localStorage.setItem('pak_tajarat_media_library', JSON.stringify(updated)); } catch {}
-      return updated;
-    });
+    setMediaLibrary(prev => prev.filter(m => m.id !== id));
     addNotification('Media Deleted', 'Image removed from the media library and storage.', 'warning');
   };
 
@@ -502,130 +470,48 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const addBlog = async (blog: BlogPost) => {
-    const publishedBlog: BlogPost = {
-      ...blog,
-      status: blog.status || 'Published',
-      isPublished: blog.isPublished !== undefined ? blog.isPublished : true,
-    };
-    setBlogs(prev => {
-      const updated = [publishedBlog, ...prev.filter(b => b.id !== publishedBlog.id)];
-      try {
-        localStorage.setItem('pak_tajarat_blogs', JSON.stringify(updated));
-      } catch (_) {}
-      return updated;
-    });
-    try {
-      await persistCms('blogs', publishedBlog.id, 'PUT', cleanUndefinedProps(publishedBlog));
-    } catch (err) {
-      console.warn("MongoDB blog save warning:", err);
-    }
-    addNotification('Blog Published 📝', `Article "${publishedBlog.title}" published and saved permanently!`, 'success');
+    const publishedBlog: BlogPost = { ...blog, status: blog.status || 'Published', isPublished: blog.isPublished !== undefined ? blog.isPublished : true };
+    await persistCms('blogs', publishedBlog.id, 'PUT', cleanUndefinedProps(publishedBlog));
+    setBlogs(prev => [publishedBlog, ...prev.filter(b => b.id !== publishedBlog.id)]);
+    addNotification('Blog Published 📝', `Article "${publishedBlog.title}" saved to MongoDB.`, 'success');
   };
 
   const updateBlog = async (blog: BlogPost) => {
-    const updatedBlog: BlogPost = {
-      ...blog,
-      status: blog.status || 'Published',
-      isPublished: blog.isPublished !== undefined ? blog.isPublished : true,
-    };
-    setBlogs(prev => {
-      const updated = prev.map(b => b.id === updatedBlog.id ? updatedBlog : b);
-      try {
-        localStorage.setItem('pak_tajarat_blogs', JSON.stringify(updated));
-      } catch (_) {}
-      return updated;
-    });
-    try {
-      await persistCms('blogs', updatedBlog.id, 'PUT', cleanUndefinedProps(updatedBlog));
-    } catch (err) {
-      console.warn("MongoDB blog update warning:", err);
-    }
-    addNotification('Blog Updated 📝', `Article "${updatedBlog.title}" updated and saved live!`, 'success');
+    const updatedBlog: BlogPost = { ...blog, status: blog.status || 'Published', isPublished: blog.isPublished !== undefined ? blog.isPublished : true };
+    await persistCms('blogs', updatedBlog.id, 'PUT', cleanUndefinedProps(updatedBlog));
+    setBlogs(prev => prev.map(b => b.id === updatedBlog.id ? updatedBlog : b));
+    addNotification('Blog Updated 📝', `Article "${updatedBlog.title}" saved to MongoDB.`, 'success');
   };
 
   const deleteBlog = async (id: string) => {
-    setBlogs(prev => {
-      const updated = prev.filter(b => b.id !== id);
-      try {
-        localStorage.setItem('pak_tajarat_blogs', JSON.stringify(updated));
-      } catch (_) {}
-      return updated;
-    });
-    try {
-      await persistCms('blogs', id, 'DELETE');
-    } catch (err) {
-      console.warn("MongoDB blog delete error:", err);
-    }
-    addNotification('Blog Deleted', 'Article deleted from database.', 'warning');
+    await persistCms('blogs', id, 'DELETE');
+    setBlogs(prev => prev.filter(b => b.id !== id));
+    addNotification('Blog Deleted', 'Article deleted from MongoDB.', 'warning');
   };
 
   const addWorkerAccount = async (workerData: Omit<WorkerAccount, 'createdAt' | 'role'>) => {
-    const newWorker: WorkerAccount = {
-      ...workerData,
-      role: 'Worker',
-      createdAt: new Date().toISOString()
-    };
-    setWorkerAccounts(prev => {
-      const updated = [...prev.filter(w => w.id !== newWorker.id), newWorker];
-      try {
-
-      } catch (_) {}
-      return updated;
-    });
-    try {
-      await persistCms('worker_accounts', newWorker.id, 'PUT', newWorker);
-    } catch (err) {
-      console.error("MongoDB worker account creation error:", err);
-    }
-    addNotification('Worker Account Created 🔑', `Worker ${newWorker.workerName} (${newWorker.id}) registered successfully!`, 'success');
+    const newWorker: WorkerAccount = { ...workerData, role: 'Worker', createdAt: new Date().toISOString() };
+    await persistCms('worker_accounts', newWorker.id, 'PUT', newWorker);
+    setWorkerAccounts(prev => [...prev.filter(w => w.id !== newWorker.id), newWorker]);
+    addNotification('Worker Account Created 🔑', `Worker ${newWorker.workerName} (${newWorker.id}) registered successfully.`, 'success');
   };
 
   const updateWorkerAccountStatus = async (workerId: string, status: 'active' | 'suspended') => {
-    setWorkerAccounts(prev => {
-      const updated = prev.map(w => w.id === workerId ? { ...w, status } : w);
-      try {
-
-      } catch (_) {}
-      return updated;
-    });
-    try {
-      await persistCms('worker_accounts', workerId, 'PATCH', { id: workerId, status });
-    } catch (err) {
-      console.error("MongoDB worker account status update error:", err);
-    }
-    addNotification('Worker Status Updated', `Worker status set to ${status.toUpperCase()}`, 'info');
+    await persistCms('worker_accounts', workerId, 'PATCH', { id: workerId, status });
+    setWorkerAccounts(prev => prev.map(w => w.id === workerId ? { ...w, status } : w));
+    addNotification('Worker Status Updated', `Worker status set to ${status.toUpperCase()}.`, 'success');
   };
 
   const deleteWorkerAccount = async (workerId: string) => {
-    setWorkerAccounts(prev => {
-      const updated = prev.filter(w => w.id !== workerId);
-      try {
-
-      } catch (_) {}
-      return updated;
-    });
-    try {
-      await persistCms('worker_accounts', workerId, 'DELETE');
-    } catch (err) {
-      console.error("MongoDB worker account delete error:", err);
-    }
-    addNotification('Worker Account Removed', `Worker account deleted successfully.`, 'warning');
+    await persistCms('worker_accounts', workerId, 'DELETE');
+    setWorkerAccounts(prev => prev.filter(w => w.id !== workerId));
+    addNotification('Worker Account Removed', 'Worker account deleted from MongoDB.', 'warning');
   };
 
   const updateWorkerAccountPassword = async (workerId: string, newPasskey: string) => {
-    setWorkerAccounts(prev => {
-      const updated = prev.map(w => w.id === workerId ? { ...w, workerPasskey: newPasskey } : w);
-      try {
-
-      } catch (_) {}
-      return updated;
-    });
-    try {
-      await persistCms('worker_accounts', workerId, 'PATCH', { id: workerId, workerPasskey: newPasskey });
-    } catch (err) {
-      console.error("MongoDB worker passkey update error:", err);
-    }
-    addNotification('Worker Password Updated 🔑', `New passkey set for worker ${workerId}`, 'success');
+    await persistCms('worker_accounts', workerId, 'PATCH', { id: workerId, workerPasskey: newPasskey });
+    setWorkerAccounts(prev => prev.map(w => w.id === workerId ? { ...w, workerPasskey: newPasskey } : w));
+    addNotification('Worker Password Updated', 'Worker password updated in MongoDB.', 'success');
   };
 
   return (
