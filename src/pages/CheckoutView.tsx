@@ -109,13 +109,6 @@ export const CheckoutView: React.FC = () => {
     }
   };
 
-  const copyRaastDetails = () => {
-    navigator.clipboard.writeText('PK78MEEZ000123456789001');
-    setCopiedRaast(true);
-    setTimeout(() => setCopiedRaast(false), 2000);
-    addNotification('Raast IBAN Copied', 'Meezan Bank Raast IBAN copied to clipboard.', 'info');
-  };
-
   const handleInitiateOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !phone || !addressLine || !city) {
@@ -477,7 +470,7 @@ export const CheckoutView: React.FC = () => {
           {/* Payment Method Selector */}
           <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 text-left">
             <h3 className="font-extrabold text-gray-900 dark:text-white text-base pb-3 border-b border-gray-100 dark:border-zinc-800 uppercase tracking-wider flex items-center justify-between">
-              <span>2. Pakistani Payment Options</span>
+              <span>2. Payment Method</span>
               <ShieldCheck size={18} className="text-[#0F9D58]" />
             </h3>
 
@@ -502,218 +495,15 @@ export const CheckoutView: React.FC = () => {
                 </div>
               </button>
 
-              {/* JAZZCASH */}
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('JazzCash')}
-                className={`p-4 rounded-2xl border text-left flex items-start space-x-3 transition-all cursor-pointer ${
-                  paymentMethod === 'JazzCash'
-                    ? 'border-[#0F9D58] bg-[#0F9D58]/10 ring-2 ring-[#0F9D58]/30'
-                    : 'border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/50'
-                }`}
-              >
-                <div className="p-2 bg-red-500/15 text-red-500 rounded-xl shrink-0 font-black text-xs">
-                  JC
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-xs">JazzCash Mobile Wallet</h4>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Instant Mobile Account PIN</p>
-                </div>
-              </button>
-
-              {/* EASYPAISA */}
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('EasyPaisa')}
-                className={`p-4 rounded-2xl border text-left flex items-start space-x-3 transition-all cursor-pointer ${
-                  paymentMethod === 'EasyPaisa'
-                    ? 'border-[#0F9D58] bg-[#0F9D58]/10 ring-2 ring-[#0F9D58]/30'
-                    : 'border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/50'
-                }`}
-              >
-                <div className="p-2 bg-emerald-500/15 text-emerald-500 rounded-xl shrink-0 font-black text-xs">
-                  EP
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-xs">EasyPaisa Wallet</h4>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Direct wallet push request</p>
-                </div>
-              </button>
-
-              {/* RAAST / BANK */}
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('Raast / Bank Transfer')}
-                className={`p-4 rounded-2xl border text-left flex items-start space-x-3 transition-all cursor-pointer ${
-                  paymentMethod === 'Raast / Bank Transfer'
-                    ? 'border-[#0F9D58] bg-[#0F9D58]/10 ring-2 ring-[#0F9D58]/30'
-                    : 'border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/50'
-                }`}
-              >
-                <div className="p-2 bg-blue-500/15 text-blue-500 rounded-xl shrink-0">
-                  <Building2 size={18} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-xs">Raast Direct / Bank</h4>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Instant 0% Fee IBAN Transfer</p>
-                </div>
-              </button>
-
-              {/* DEBIT / CREDIT CARD */}
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('Debit/Credit Card')}
-                className={`p-4 rounded-2xl border text-left flex items-start space-x-3 transition-all cursor-pointer ${
-                  paymentMethod === 'Debit/Credit Card'
-                    ? 'border-[#0F9D58] bg-[#0F9D58]/10 ring-2 ring-[#0F9D58]/30'
-                    : 'border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/50'
-                }`}
-              >
-                <div className="p-2 bg-purple-500/15 text-purple-500 rounded-xl shrink-0">
-                  <CreditCard size={18} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-xs">Visa / MasterCard</h4>
-                  <p className="text-[10px] text-gray-400 mt-0.5">International & Local Cards</p>
-                </div>
-              </button>
-
-            </div>
-
-            {/* JAZZCASH / EASYPAISA INPUTS */}
-            {(paymentMethod === 'JazzCash' || paymentMethod === 'EasyPaisa') && (
-              <div className="p-5 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-3 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-emerald-400 flex items-center space-x-1.5">
-                    <Smartphone size={14} />
-                    <span>{paymentMethod} Wallet Checkout</span>
-                  </h4>
-                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">
-                    Automated Push Request
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">
-                      {paymentMethod} Account Mobile Number *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="03001234567"
-                      value={walletPhone}
-                      onChange={e => setWalletPhone(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-[#0F9D58]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">
-                      CNIC Last 6 Digits (Verification)
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      placeholder="345678"
-                      value={cnicLast4}
-                      onChange={e => setCnicLast4(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-[#0F9D58]"
-                    />
-                  </div>
-                </div>
-                <p className="text-[10px] text-gray-400">
-                  After clicking Place Order, a USSD / MPIN popup will appear on your phone number ({walletPhone || '0300xxxxxxx'}) to authorize the transaction.
+              <div className="p-4 rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-950/20 text-left">
+                <h4 className="font-bold text-gray-900 dark:text-white text-xs">Online payments are not enabled yet</h4>
+                <p className="text-[11px] text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                  JazzCash, EasyPaisa, bank transfer and card payments will be enabled after verified merchant details and secure payment processing are configured. Cash on Delivery is available now.
                 </p>
               </div>
-            )}
+            </div>
 
-            {/* RAAST DETAILS & TX REFERENCE */}
-            {paymentMethod === 'Raast / Bank Transfer' && (
-              <div className="p-5 bg-zinc-950/40 border border-zinc-800 rounded-2xl space-y-3 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-blue-400 flex items-center space-x-1.5">
-                    <Building2 size={14} />
-                    <span>Pak-Tajarat Official Raast / Bank Account</span>
-                  </h4>
-                  <button
-                    type="button"
-                    onClick={copyRaastDetails}
-                    className="text-[10px] bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center space-x-1 cursor-pointer transition-colors"
-                  >
-                    {copiedRaast ? <Check size={12} /> : <Copy size={12} />}
-                    <span>{copiedRaast ? 'Copied' : 'Copy IBAN'}</span>
-                  </button>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-3 bg-zinc-900 rounded-xl text-xs">
-                  <div>
-                    <span className="text-gray-400 text-[10px] block">Bank Name</span>
-                    <strong className="text-white">Meezan Bank Limited</strong>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 text-[10px] block">Account Title</span>
-                    <strong className="text-white">PAK-TAJARAT ENTERPRISE</strong>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 text-[10px] block">Raast ID / Phone</span>
-                    <strong className="text-emerald-400 font-mono">03261604808</strong>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">
-                    Enter Bank Transfer Transaction Ref ID / Slip No *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. 982301492041"
-                    value={bankTxRef}
-                    onChange={e => setBankTxRef(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-[#0F9D58]"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* CARD INPUTS */}
-            {paymentMethod === 'Debit/Credit Card' && (
-              <div className="p-5 bg-zinc-950/40 border border-zinc-800 rounded-2xl grid grid-cols-3 gap-3 animate-in fade-in duration-200">
-                <div className="col-span-3 space-y-1">
-                  <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Debit/Credit Card Number *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="4000 1234 5678 9010"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 text-xs text-white font-mono focus:border-[#0F9D58]"
-                  />
-                </div>
-                <div className="col-span-2 space-y-1">
-                  <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Expiry Date *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="MM/YY"
-                    value={cardExpiry}
-                    onChange={(e) => setCardExpiry(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 text-xs text-white font-mono focus:border-[#0F9D58]"
-                  />
-                </div>
-                <div className="col-span-1 space-y-1">
-                  <label className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">CVV *</label>
-                  <input
-                    type="password"
-                    required
-                    maxLength={4}
-                    placeholder="123"
-                    value={cardCvv}
-                    onChange={(e) => setCardCvv(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 text-xs text-white font-mono focus:border-[#0F9D58]"
-                  />
-                </div>
-              </div>
-            )}
           </div>
 
         </div>
