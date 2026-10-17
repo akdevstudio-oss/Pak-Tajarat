@@ -3,12 +3,43 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { MongoClient } from "mongodb";
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
+
+  // Read-only MongoDB health check. Never returns connection details or secrets.
+  app.get("/api/db-health", async (_req, res) => {
+    const uri = process.env.MONGODB_URI?.trim();
+    const dbName = process.env.MONGODB_DB_NAME?.trim() || "paktijarat";
+    if (!uri) {
+      return res.status(503).json({
+        ok: false,
+        message: "MongoDB is not configured on this deployment.",
+        missing: ["MONGODB_URI"],
+      });
+    }
+
+    const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
+    try {
+      await client.connect();
+      await client.db(dbName).command({ ping: 1 });
+      res.setHeader("Cache-Control", "no-store");
+      return res.json({ ok: true, message: "MongoDB connection successful.", database: dbName });
+    } catch (error) {
+      console.error("MongoDB health check failed:", error instanceof Error ? error.message : "Unknown error");
+      return res.status(503).json({
+        ok: false,
+        message: "MongoDB connection failed. Check Atlas network access, database user permissions, and server environment configuration.",
+      });
+    } finally {
+      await client.close().catch(() => undefined);
+    }
+  });
+
 
   // Minimal, read-only Cloudflare R2 connectivity check.
   // Never returns credentials or bucket contents.
