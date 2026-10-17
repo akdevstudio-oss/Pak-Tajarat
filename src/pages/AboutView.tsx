@@ -124,20 +124,20 @@ export const AboutView: React.FC = () => {
         {/* Trust & Stats Row */}
         <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-gray-100 dark:border-zinc-800 text-center">
           <div>
-            <p className="text-2xl font-black text-[#0F9D58]">5,000+</p>
-            <p className="text-xs text-gray-500 font-bold mt-0.5">Happy Customers</p>
+            <p className="text-2xl font-black text-[#0F9D58]">Nationwide</p>
+            <p className="text-xs text-gray-500 font-bold mt-0.5">Customer Reach</p>
           </div>
           <div>
-            <p className="text-2xl font-black text-[#0F9D58]">200+</p>
-            <p className="text-xs text-gray-500 font-bold mt-0.5">Products Listed</p>
+            <p className="text-2xl font-black text-[#0F9D58]">Admin-Managed</p>
+            <p className="text-xs text-gray-500 font-bold mt-0.5">Product Catalog</p>
           </div>
           <div>
             <p className="text-2xl font-black text-[#0F9D58]">9</p>
             <p className="text-xs text-gray-500 font-bold mt-0.5">Product Categories</p>
           </div>
           <div>
-            <p className="text-2xl font-black text-[#0F9D58]">4.8★</p>
-            <p className="text-xs text-gray-500 font-bold mt-0.5">Average Rating</p>
+            <p className="text-2xl font-black text-[#0F9D58]">COD</p>
+            <p className="text-xs text-gray-500 font-bold mt-0.5">Payment Option</p>
           </div>
         </div>
       </div>
