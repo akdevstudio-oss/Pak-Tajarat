@@ -100,14 +100,14 @@ export const AffiliatePortalView: React.FC = () => {
   const globalReferralLink = `${baseUrl}/?ref=${referralCode}`;
 
   // Calculated Stats
-  const totalClicks = currentAffiliate?.totalClicks || 128;
-  const totalOrdersCount = currentAffiliate?.totalReferrals || 14;
-  const totalEarned = currentAffiliate?.totalEarnings || 8400;
-  const pendingCommission = currentAffiliate?.pendingCommission || 1200;
-  const paidCommission = currentAffiliate?.paidCommission || 7200;
+  const totalClicks = currentAffiliate?.totalClicks ?? 0;
+  const totalOrdersCount = currentAffiliate?.totalReferrals ?? 0;
+  const totalEarned = currentAffiliate?.totalEarnings ?? 0;
+  const pendingCommission = currentAffiliate?.pendingCommission ?? 0;
+  const paidCommission = currentAffiliate?.paidCommission ?? 0;
   const approvedCommission = Math.max(0, totalEarned - pendingCommission);
-  const availableBalance = Math.max(0, pendingCommission); // available balance for payout
-  const conversionRate = totalClicks > 0 ? ((totalOrdersCount / totalClicks) * 100).toFixed(1) : '10.9';
+  const availableBalance = Math.max(0, approvedCommission - paidCommission); // only approved, unpaid commission is withdrawable
+  const conversionRate = totalClicks > 0 ? ((totalOrdersCount / totalClicks) * 100).toFixed(1) : '0.0';
 
   // Level Badge calculation
   const getAffiliateTier = (ordersCount: number) => {
@@ -120,50 +120,8 @@ export const AffiliatePortalView: React.FC = () => {
   const tierInfo = getAffiliateTier(totalOrdersCount);
 
   // Referred orders derived list
-  const referredOrdersList = useMemo(() => {
-    return [
-      {
-        id: 'ORD-94812',
-        productName: 'Wireless Noise Cancelling Headphones',
-        quantity: 1,
-        customerMasked: 'M*** A***',
-        orderValue: 8500,
-        commission: 850,
-        status: 'Approved',
-        deliveryDate: '2026-07-15',
-      },
-      {
-        id: 'ORD-94833',
-        productName: 'Smart Fitness Watch Series 7',
-        quantity: 2,
-        customerMasked: 'S*** K***',
-        orderValue: 12400,
-        commission: 1240,
-        status: 'Pending Cooling (7 Days)',
-        deliveryDate: '2026-07-20',
-      },
-      {
-        id: 'ORD-94790',
-        productName: 'Organic Cotton Polo T-Shirt',
-        quantity: 3,
-        customerMasked: 'F*** R***',
-        orderValue: 4500,
-        commission: 450,
-        status: 'Approved',
-        deliveryDate: '2026-07-10',
-      },
-      {
-        id: 'ORD-94650',
-        productName: 'Ultra Precision Gaming Mouse',
-        quantity: 1,
-        customerMasked: 'H*** Z***',
-        orderValue: 3200,
-        commission: 320,
-        status: 'Cancelled',
-        deliveryDate: '2026-07-02',
-      }
-    ];
-  }, []);
+  // Do not display fabricated referral orders; show only records returned by the affiliate API.
+  const referredOrdersList = useMemo(() => [], []);
 
   // Filtered orders list
   const filteredReferredOrders = useMemo(() => {
@@ -179,23 +137,10 @@ export const AffiliatePortalView: React.FC = () => {
   }, [referredOrdersList, orderSearch, orderStatusFilter]);
 
   // Chart data
-  const trendChartData = useMemo(() => [
-    { name: 'Mon', Clicks: 18, Earnings: 450 },
-    { name: 'Tue', Clicks: 25, Earnings: 850 },
-    { name: 'Wed', Clicks: 32, Earnings: 1200 },
-    { name: 'Thu', Clicks: 28, Earnings: 950 },
-    { name: 'Fri', Clicks: 45, Earnings: 1800 },
-    { name: 'Sat', Clicks: 52, Earnings: 2300 },
-    { name: 'Sun', Clicks: 60, Earnings: 2800 },
-  ], []);
+  const trendChartData = useMemo(() => [], []);
 
   // Category distribution data
-  const categoryPieData = [
-    { name: 'Electronics', value: 45, color: '#0F9D58' },
-    { name: 'Fashion', value: 30, color: '#3B82F6' },
-    { name: 'Home & Living', value: 15, color: '#F59E0B' },
-    { name: 'Beauty', value: 10, color: '#EC4899' },
-  ];
+  const categoryPieData: { name: string; value: number; color: string }[] = [];
 
   // Helper copy function
   const copyToClipboard = (text: string, label: string, idStr: string) => {
