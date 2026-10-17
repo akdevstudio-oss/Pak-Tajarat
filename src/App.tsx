@@ -115,7 +115,7 @@ const AppContent: React.FC = () => {
       } else if (path === '/profile' || path === '/my-account') {
         setCurrentView('profile');
       } else if (path === '/affiliate-portal' || path === '/affiliate') {
-        setCurrentView('affiliate-status');
+        setCurrentView('affiliate-portal');
       } else if (path === '/about') {
         setCurrentView('about');
       } else if (path === '/contact') {
