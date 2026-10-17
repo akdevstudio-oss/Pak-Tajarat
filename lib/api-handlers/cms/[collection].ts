@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { getDatabase } from "../../mongodb-server.js";
 import { requireAdmin } from "../../admin-session.js";
 type Request = IncomingMessage & { body?: any; query?: Record<string,string|string[]|undefined> };
-const COLLECTIONS: Record<string,string> = { branding:"cms_branding", blogs:"blogs", worker_accounts:"worker_accounts", media:"cms_media", coupons:"coupons" };
+const COLLECTIONS: Record<string,string> = { branding:"cms_branding", blogs:"blogs", worker_accounts:"worker_accounts", media:"cms_media", coupons:"coupons", categories:"cms_categories", seo:"cms_seo", hero_banners:"cms_hero_banners" };
 function json(res:ServerResponse,status:number,body:unknown){res.statusCode=status;res.setHeader("Content-Type","application/json; charset=utf-8");res.end(JSON.stringify(body));}
 function param(value:string|string[]|undefined){return String(Array.isArray(value)?value[0]:value||"");}
 export default async function handler(req:Request,res:ServerResponse){
