@@ -1,6 +1,6 @@
 # MongoDB Atlas connection
 
-Pak-Tijarat now has a server-only MongoDB connection helper and a read-only health endpoint on the migration branch.
+Pak-Tijarat uses server-side MongoDB access for application data. Database credentials must remain on the server and must never be bundled into browser code.
 
 ## Vercel environment variables
 
@@ -13,12 +13,12 @@ Never add either variable with a `VITE_` prefix and never return the URI to the 
 
 ## Test the connection
 
-After the branch preview deployment is ready, open:
+After deployment is ready, open:
 
 `/api/db-health`
 
 A successful response contains `ok: true`. A failed response does not expose the URI or credentials. If the test fails, check Atlas Network Access, the database user's permissions, and the Vercel environment target.
 
-## Migration status and safety
+## Data safety
 
-This endpoint only verifies connectivity; it does not migrate product, customer, order, affiliate, or admin data. Firebase is still required by existing frontend contexts. Do not remove Firebase configuration or its package until those workflows have been migrated and tested against authenticated server-side APIs. The production domain should not be switched until preview tests pass.
+The health endpoint only verifies connectivity; it does not migrate or delete product, customer, order, affiliate, or administrator data. Verify the storefront, administrator login, product management, image uploads, and order checkout against the live database before treating the migration as complete.
