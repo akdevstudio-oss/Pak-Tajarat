@@ -23,7 +23,7 @@ export function getInitialRoute(): { view: ActiveView; productId: string | null 
   if (path === '/checkout') return { view: 'checkout', productId: null };
   if (path === '/auth' || path === '/login' || path === '/signup') return { view: 'auth', productId: null };
   if (path === '/profile' || path === '/my-account') return { view: 'profile', productId: null };
-  if (path === '/affiliate-portal' || path === '/affiliate') return { view: 'affiliate-status', productId: null };
+  if (path === '/affiliate-portal' || path === '/affiliate') return { view: 'affiliate-portal', productId: null };
   if (path === '/about') return { view: 'about', productId: null };
   if (path === '/contact') return { view: 'contact', productId: null };
   if (path === '/privacy') return { view: 'privacy', productId: null };
