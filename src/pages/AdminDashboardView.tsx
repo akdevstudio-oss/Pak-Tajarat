@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { optimizeAndUploadImage } from '../utils/imageOptimizer';
 import { useApp } from '../context/AppContext';
 import { Product, Order, CATEGORIES, BlogPost, Coupon, Review, Affiliate } from '../shared/types';
 import { Logo } from '../components/Logo';
@@ -521,38 +522,26 @@ export const AdminDashboardView: React.FC = () => {
     const uploadedList: string[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      let finalUrl = '';
       try {
-        if (!file.type.startsWith('image/')) throw new Error('Please select an image file.');
-        const response = await fetch('/api/media/upload', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': file.type, 'X-Media-Folder': 'products' },
-          body: file
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok || !result.ok || !result.url) {
-          throw new Error(result.error || 'Image upload failed. Check the 4 MB file limit and R2 setup.');
-        }
-        finalUrl = result.url;
+        const result = await optimizeAndUploadImage(file, 'products', 1600, 0.82);
+        if (!result.url) throw new Error('The server did not return an image URL.');
+        uploadedList.push(result.url);
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Please try again.';
-        console.warn('Cloudflare R2 image upload failed:', message);
+        console.warn('Product image upload failed:', message);
         addNotification('Image Upload Failed', message, 'warning');
       }
-      if (finalUrl) uploadedList.push(finalUrl);
     }
 
-    setPImages(prev => {
-      const updated = [...prev, ...uploadedList];
-      return updated;
-    });
+    if (uploadedList.length > 0) {
+      setPImages(prev => {
+        const updated = [...prev, ...uploadedList];
+        return updated;
+      });
 
-    if (!pImage && uploadedList.length > 0) {
-      setPImage(uploadedList[0]);
+      if (!pImage) setPImage(uploadedList[0]);
+      addNotification('Images Uploaded', `${uploadedList.length} product image(s) optimized and uploaded successfully!`, 'success');
     }
-
-    addNotification('Images Processed', `${uploadedList.length} product image(s) uploaded successfully!`, 'success');
   };
 
   const handleAddImageUrl = () => {
