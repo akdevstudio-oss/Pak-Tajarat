@@ -3,7 +3,7 @@ import { AppProvider, useApp, useAffiliate } from './context/AppContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { QuickViewModal } from './components/QuickViewModal';
-import { AiCustomerChatbot } from './components/AiCustomerChatbot';
+const AiCustomerChatbot = React.lazy(() => import('./components/AiCustomerChatbot').then(m => ({ default: m.AiCustomerChatbot })));
 
 import { PageSkeletonLoader } from './components/PageSkeletonLoader';
 
@@ -249,7 +249,7 @@ const AppContent: React.FC = () => {
       <QuickViewModal />
 
       {/* Floating AI Customer Support Chatbot */}
-      <AiCustomerChatbot />
+      <React.Suspense fallback={null}><AiCustomerChatbot /></React.Suspense>
 
       {/* Dynamic Floating Toast Alerts Center (Bottom Right Corner) */}
       <div className="fixed bottom-6 right-6 z-50 space-y-3 max-w-xs sm:max-w-sm w-full pointer-events-none">
