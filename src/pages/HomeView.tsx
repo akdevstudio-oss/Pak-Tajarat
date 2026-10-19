@@ -89,7 +89,7 @@ export const HomeView: React.FC = () => {
             
             {/* Product image is visible on mobile and desktop when available */}
             {banners[activeBanner].image && (
-              <div className="order-first lg:order-none lg:col-span-5 relative w-full max-w-sm mx-auto lg:max-w-none">
+              <div className="order-first lg:order-last lg:col-span-5 relative w-full max-w-sm mx-auto lg:max-w-none">
                 <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 transform lg:rotate-1 lg:hover:rotate-0 transition-transform duration-500">
                   <img src={banners[activeBanner].image} alt={banners[activeBanner].title} className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" referrerPolicy="no-referrer" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
