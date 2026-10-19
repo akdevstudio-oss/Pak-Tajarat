@@ -112,7 +112,7 @@ export const AiCustomerChatbot: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 font-sans">
+    <div className="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-50 font-sans max-w-[calc(100vw-1.5rem)]">
       {/* FLOATING TRIGGER BUTTON */}
       {!isOpen && (
         <button
@@ -138,8 +138,8 @@ export const AiCustomerChatbot: React.FC = () => {
 
       {/* CHAT WINDOW */}
       {isOpen && (
-        <div className={`bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 w-[90vw] sm:w-[380px] ${
-          isMinimized ? 'h-[64px]' : 'h-[520px] max-h-[80vh]'
+        <div className={`bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 w-[calc(100vw-1.5rem)] sm:w-[380px] ${
+          isMinimized ? 'h-[64px]' : 'h-[520px] max-h-[calc(100dvh-5rem)]'
         }`}>
           {/* CHAT HEADER */}
           <div className="bg-gradient-to-r from-emerald-900 via-zinc-900 to-zinc-900 p-3.5 border-b border-zinc-800 flex items-center justify-between shrink-0">
