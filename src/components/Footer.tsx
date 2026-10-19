@@ -24,7 +24,7 @@ export const Footer: React.FC = () => {
     if (email.trim()) {
       setSubscribed(true);
       setEmail('');
-      addNotification('Subscribed!', 'Thank you for joining the Pak-Tijarat newsletter!', 'success');
+      addNotification('Subscribed!', 'Thank you for joining the Pak-Tajarat newsletter!', 'success');
     }
   };
 
@@ -155,7 +155,7 @@ export const Footer: React.FC = () => {
             {brandingConfig?.logoType === 'image' && (brandingConfig?.logoImageUrl || brandingConfig?.websiteLogo) ? (
               <img
                 src={brandingConfig.logoImageUrl || brandingConfig.websiteLogo}
-                alt={brandingConfig.customText || 'Pak-Tijarat'}
+                alt={brandingConfig.customText || 'Pak-Tajarat'}
                 className="h-10 w-auto max-w-[180px] object-contain rounded-lg"
                 referrerPolicy="no-referrer"
               />
@@ -177,10 +177,10 @@ export const Footer: React.FC = () => {
           </p>
           {/* Verified contact channels; do not link to generic social-media homepages */}
           <div className="pt-2 flex items-center space-x-3 text-zinc-400">
-            <a href="https://wa.me/923261604808" target="_blank" rel="noreferrer" aria-label="Chat with Pak-Tijarat on WhatsApp" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
+            <a href="https://wa.me/923261604808" target="_blank" rel="noreferrer" aria-label="Chat with Pak-Tajarat on WhatsApp" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
               <MessageSquare size={16} />
             </a>
-            <a href="mailto:alikhanxada1001@gmail.com" aria-label="Email Pak-Tijarat support" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
+            <a href="mailto:alikhanxada1001@gmail.com" aria-label="Email Pak-Tajarat support" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
               <Mail size={16} />
             </a>
           </div>
@@ -349,7 +349,7 @@ export const Footer: React.FC = () => {
       <div className="bg-zinc-950 text-zinc-500 text-xs py-6 border-t border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
           <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-3 text-center sm:text-left">
-            <p>© Pak-Tijarat. All Rights Reserved.</p>
+            <p>© Pak-Tajarat. All Rights Reserved.</p>
             <span className="hidden sm:inline text-zinc-700">•</span>
             <p className="text-zinc-400 font-medium">Created by <span className="text-[#0F9D58] font-bold">Ali Khanxada</span></p>
           </div>
