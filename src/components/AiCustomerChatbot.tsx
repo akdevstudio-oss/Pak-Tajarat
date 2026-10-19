@@ -20,7 +20,7 @@ export const AiCustomerChatbot: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'assistant',
-      text: 'Assalam-o-Alaikum! 👋 Main Taj (تاج) hoon, Pak-Tajarat ka AI Shopping Assistant. Main aap ki kya madad kar sakta hoon?',
+      text: 'Assalam-o-Alaikum! 👋 Main Taj (تاج) hoon, Pak-Tajarat ka Shopping Assistant. Main aap ki kya madad kar sakta hoon?',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -128,10 +128,10 @@ export const AiCustomerChatbot: React.FC = () => {
             </span>
           </div>
           <span className="hidden md:inline font-bold text-xs pr-1">
-            AI Customer Support
+            Shopping Support
           </span>
           <span className="bg-amber-400 text-zinc-950 font-black text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider hidden md:inline">
-            Live
+            Help
           </span>
         </button>
       )}
@@ -155,11 +155,11 @@ export const AiCustomerChatbot: React.FC = () => {
                   <h3 className="font-extrabold text-sm text-white">Taj (تاج)</h3>
                   <span className="bg-emerald-950 border border-emerald-700 text-emerald-300 font-bold text-[9px] px-1.5 py-0.5 rounded-full flex items-center space-x-1">
                     <Sparkles size={10} className="text-amber-400" />
-                    <span>Pak-Tajarat AI</span>
+                    <span>Store Help</span>
                   </span>
                 </div>
                 <p className="text-[10px] text-emerald-400/90 font-medium flex items-center space-x-1">
-                  <span>● Online | 24/7 Shopping Support</span>
+                  <span>● Quick replies · Product &amp; store info</span>
                 </p>
               </div>
             </div>
