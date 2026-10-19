@@ -43,8 +43,6 @@ export const Header: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [mobileSearchVisible, setMobileSearchVisible] = useState(true);
-  const [flashSaleTimer, setFlashSaleTimer] = useState({ hours: 14, minutes: 23, seconds: 58 });
-
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
   const desktopInputRef = useRef<HTMLInputElement>(null);
@@ -81,24 +79,6 @@ export const Header: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('keydown', handleEscape);
     };
-  }, []);
-
-  // Countdown timer for Flash Sale
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFlashSaleTimer(prev => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        } else {
-          return { hours: 24, minutes: 0, seconds: 0 };
-        }
-      });
-    }, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   // Filter products for live search (up to 6 results)
@@ -196,11 +176,11 @@ export const Header: React.FC = () => {
             </a>
           </div>
           <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-            <span className="font-extrabold uppercase bg-yellow-400 text-gray-950 text-[9px] px-1.5 py-0.5 rounded-md animate-pulse shrink-0">
-              Flash Sale
+            <span className="font-extrabold uppercase bg-emerald-500/20 text-emerald-100 text-[9px] px-1.5 py-0.5 rounded-md shrink-0">
+              Pak-Tajarat
             </span>
-            <span className="font-mono bg-black/40 px-1.5 py-0.5 rounded text-yellow-300 font-bold text-[10px] sm:text-xs tracking-wider">
-              {String(flashSaleTimer.hours).padStart(2, '0')}:{String(flashSaleTimer.minutes).padStart(2, '0')}:{String(flashSaleTimer.seconds).padStart(2, '0')}
+            <span className="text-white/90 text-[10px] sm:text-xs font-semibold tracking-wide">
+              Discover our products
             </span>
           </div>
         </div>
