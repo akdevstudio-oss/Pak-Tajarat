@@ -26,24 +26,48 @@ export const HomeView: React.FC = () => {
   const newArrivals = activeProducts.filter(p => p.isNewArrival).slice(0, 4);
   const flashSaleProducts = activeProducts.filter(p => p.isFlashSale).slice(0, 3);
 
-  // Show the real catalog product instead of promotional/demo products.
-  const banners = activeProducts.length > 0 ? [{
-    id: 'real-product',
-    title: "Carry Confidence. Go Further.",
-    subtitle: "One backpack. Every journey.",
-    description: "Made in Pakistan for work, study, and travel.",
-    gradient: "from-emerald-800 to-teal-950",
-    image: activeProducts[0].image,
-    badge: "MADE FOR YOUR NEXT MOVE"
-  }] : [{
-    id: 'empty-catalog',
-    title: "Pak-Tijarat",
-    subtitle: "Pakistan's Trusted Digital Marketplace",
-    description: "Our next products will be added by the store admin.",
-    gradient: "from-emerald-800 to-teal-950",
-    image: "",
-    badge: "COMING SOON"
-  }];
+  // Prefer the admin-managed CMS hero banners. The old implementation always
+  // replaced them with the first catalog product, so admin uploads never appeared.
+  const currentTime = Date.now();
+  const publishedCmsBanners = heroBanners
+    .filter(banner => {
+      const enabled = banner.isEnabled ?? true;
+      const started = !banner.startDate || Number.isNaN(Date.parse(banner.startDate)) || Date.parse(banner.startDate) <= currentTime;
+      const notExpired = !banner.endDate || Number.isNaN(Date.parse(banner.endDate)) || Date.parse(banner.endDate) >= currentTime;
+      return enabled && started && notExpired && Boolean(banner.image || banner.imageUrl);
+    })
+    .slice()
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  const banners = publishedCmsBanners.length > 0
+    ? publishedCmsBanners.map(banner => ({
+        id: banner.id,
+        title: banner.title || 'Pak-Tijarat',
+        subtitle: banner.subtitle || "Pakistan's Trusted Digital Marketplace",
+        description: banner.description || 'Discover trusted products for work, study, and travel.',
+        gradient: banner.gradient || 'from-emerald-800 to-teal-950',
+        image: banner.image || banner.imageUrl || '',
+        badge: banner.badge || banner.badgeText || 'PAK-TIJARAT'
+      }))
+    : activeProducts.length > 0
+      ? [{
+          id: 'real-product',
+          title: "Carry Confidence. Go Further.",
+          subtitle: "One backpack. Every journey.",
+          description: "Made in Pakistan for work, study, and travel.",
+          gradient: "from-emerald-800 to-teal-950",
+          image: activeProducts[0].image,
+          badge: "MADE FOR YOUR NEXT MOVE"
+        }]
+      : [{
+          id: 'empty-catalog',
+          title: "Pak-Tijarat",
+          subtitle: "Pakistan's Trusted Digital Marketplace",
+          description: "Our next products will be added by the store admin.",
+          gradient: "from-emerald-800 to-teal-950",
+          image: "",
+          badge: "COMING SOON"
+        }];
 
   const [activeBanner, setActiveBanner] = useState(0);
 
