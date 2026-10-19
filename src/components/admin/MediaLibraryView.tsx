@@ -55,8 +55,9 @@ export const MediaLibraryView: React.FC = () => {
       }
       addNotification('Upload Complete', `${files.length} image(s) processed and stored in Media Library.`, 'success');
     } catch (err) {
-      console.error(err);
-      addNotification('Upload Error', 'Failed to upload image to Media Library.', 'warning');
+      console.error('Media Library upload failed:', err);
+      const message = err instanceof Error ? err.message : 'Please try again.';
+      addNotification('Upload Error', message, 'warning');
     } finally {
       setIsUploading(false);
     }
@@ -128,7 +129,10 @@ export const MediaLibraryView: React.FC = () => {
             multiple
             disabled={isUploading}
             className="hidden"
-            onChange={e => handleFileUpload(e.target.files)}
+            onChange={e => {
+              const input = e.currentTarget;
+              void handleFileUpload(input.files).finally(() => { input.value = ''; });
+            }}
           />
         </label>
       </div>
