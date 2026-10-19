@@ -177,7 +177,7 @@ export const Header: React.FC = () => {
           </div>
           <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
             <span className="font-extrabold uppercase bg-emerald-500/20 text-emerald-100 text-[9px] px-1.5 py-0.5 rounded-md shrink-0">
-              Pak-Tajarat
+              Pak-Tijarat
             </span>
             <span className="text-white/90 text-[10px] sm:text-xs font-semibold tracking-wide">
               Discover our products
