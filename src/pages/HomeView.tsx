@@ -87,6 +87,16 @@ export const HomeView: React.FC = () => {
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-8 md:p-16 relative z-10 w-full items-center">
             
+            {/* Product image is visible on mobile and desktop when available */}
+            {banners[activeBanner].image && (
+              <div className="order-first lg:order-none lg:col-span-5 relative w-full max-w-sm mx-auto lg:max-w-none">
+                <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 transform lg:rotate-1 lg:hover:rotate-0 transition-transform duration-500">
+                  <img src={banners[activeBanner].image} alt={banners[activeBanner].title} className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" referrerPolicy="no-referrer" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                </div>
+              </div>
+            )}
+
             {/* Banner Text details */}
             <div className="lg:col-span-7 space-y-6 text-left">
               <span className="inline-flex items-center space-x-1 bg-emerald-950/45 text-emerald-300 text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-emerald-500/25">
@@ -124,21 +134,7 @@ export const HomeView: React.FC = () => {
               </div>
             </div>
 
-            {/* Banner Illustration/Photo */}
-            <div className="hidden lg:block lg:col-span-5 relative">
-              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                <img
-                  src={banners[activeBanner].image || undefined}
-                  alt={banners[activeBanner].title}
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                  fetchPriority="high"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              </div>
-            </div>
+
           </div>
 
           {/* Carousel Dot Selectors */}
@@ -274,7 +270,7 @@ export const HomeView: React.FC = () => {
                   <div className="space-y-1 pt-1.5">
                     <div className="flex justify-between text-[10px] text-gray-400 font-bold">
                       <span>Available Stock: {p.stock} units</span>
-                      <span className="text-red-500">Almost Sold!</span>
+                      <span className={p.stock > 0 ? "text-emerald-600" : "text-red-500"}>{p.stock > 0 ? "In Stock" : "Out of Stock"}</span>
                     </div>
                     <div className="w-full bg-gray-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
                       <div 
@@ -302,7 +298,7 @@ export const HomeView: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className={"grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 " + (featuredProducts.length === 1 ? "max-w-sm mx-auto w-full" : "")}>
           {featuredProducts.map((p, idx) => (
             <ProductCard key={p.id ? `${p.id}-${idx}` : `feat-${idx}`} product={p} />
           ))}
