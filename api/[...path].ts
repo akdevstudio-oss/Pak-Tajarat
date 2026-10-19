@@ -19,6 +19,7 @@ import productItem from "../lib/api-handlers/products/[id].js";
 import productClear from "../lib/api-handlers/products/clear.js";
 import productIndex from "../lib/api-handlers/products/index.js";
 import r2Health from "../lib/api-handlers/r2/health.js";
+import customerSupportChat from "../lib/api-handlers/customer-support-chat.js";
 
 type ApiRequest = IncomingMessage & {
   body?: any;
@@ -30,7 +31,7 @@ const handlers: Record<string, (req: any, res: ServerResponse) => unknown> = {
   "auth/logout": authLogout, "auth/profile": authProfile, "auth/session": authSession,
   "cms": cmsCollection, "db-health": dbHealth, "media-object": mediaObject,
   "media/delete": mediaDelete, "media/upload": mediaUpload, "orders": ordersHandler, "products": productIndex,
-  "products/[id]": productItem, "products/clear": productClear, "r2/health": r2Health,
+  "products/[id]": productItem, "products/clear": productClear, "r2/health": r2Health, "customer-support-chat": customerSupportChat,
 };
 export const config = { api: { bodyParser: false } };
 
