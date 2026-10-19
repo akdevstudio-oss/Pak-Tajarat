@@ -177,6 +177,19 @@ export const ProductDetailsView: React.FC = () => {
     return () => restore.reverse().forEach(cleanup => cleanup());
   }, [product, reviews]);
 
+  // Live product view tracking
+  useEffect(() => {
+    if (product) {
+      trackLiveEvent(
+        'page_view', 
+        `Viewed Product: ${product.name} (Rs. ${product.price.toLocaleString()})`, 
+        'product_details', 
+        { productId: product.id, price: product.price, category: product.category },
+        currentUser
+      );
+    }
+  }, [product?.id]);
+
   if (!product) {
     return (
       <div className="py-20 text-center space-y-4">
@@ -198,19 +211,6 @@ export const ProductDetailsView: React.FC = () => {
 
   const isLiked = isInWishlist(product.id);
   const isCompared = isInCompare(product.id);
-
-  // Live product view tracking
-  useEffect(() => {
-    if (product) {
-      trackLiveEvent(
-        'page_view', 
-        `Viewed Product: ${product.name} (Rs. ${product.price.toLocaleString()})`, 
-        'product_details', 
-        { productId: product.id, price: product.price, category: product.category },
-        currentUser
-      );
-    }
-  }, [product?.id]);
 
   const incrementQty = () => {
     if (quantity < product.stock) setQuantity(quantity + 1);
