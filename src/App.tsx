@@ -252,7 +252,7 @@ const AppContent: React.FC = () => {
       <React.Suspense fallback={null}><AiCustomerChatbot /></React.Suspense>
 
       {/* Dynamic Floating Toast Alerts Center (Bottom Right Corner) */}
-      <div className="fixed bottom-6 right-6 z-50 space-y-3 max-w-xs sm:max-w-sm w-full pointer-events-none">
+      <div className="fixed bottom-4 left-4 right-4 sm:bottom-6 sm:left-auto sm:right-6 z-50 space-y-3 w-auto sm:w-full max-w-sm pointer-events-none">
         {activeUnreadNotifications.slice(0, 3).map((toast, idx) => (
           <div
             key={toast.id ? `${toast.id}-${idx}` : `toast-${idx}`}
