@@ -4,7 +4,7 @@ import { Logo } from './Logo';
 import { 
   Phone, Mail, MapPin, MessageSquare, ShieldCheck, 
   Truck, RotateCcw, Award, CheckCircle, ArrowUp,
-  Facebook, Instagram, Twitter, Linkedin, Handshake
+  Handshake
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
@@ -175,19 +175,13 @@ export const Footer: React.FC = () => {
           <p className="text-sm text-zinc-400 leading-relaxed">
             Pakistan's trusted digital gateway to premium lifestyle products, state-of-the-art electronics, local design houses, and reliable grocery. Quality checked, carefully packed, and delivered right to your door.
           </p>
-          {/* Social Media Icons */}
+          {/* Verified contact channels; do not link to generic social-media homepages */}
           <div className="pt-2 flex items-center space-x-3 text-zinc-400">
-            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
-              <Facebook size={16} />
+            <a href="https://wa.me/923261604808" target="_blank" rel="noreferrer" aria-label="Chat with Pak-Tijarat on WhatsApp" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
+              <MessageSquare size={16} />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
-              <Instagram size={16} />
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
-              <Twitter size={16} />
-            </a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
-              <Linkedin size={16} />
+            <a href="mailto:alikhanxada1001@gmail.com" aria-label="Email Pak-Tijarat support" className="p-2 bg-zinc-800 hover:bg-[#0F9D58] hover:text-white rounded-xl transition-all">
+              <Mail size={16} />
             </a>
           </div>
         </div>
