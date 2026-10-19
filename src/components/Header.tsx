@@ -188,7 +188,7 @@ export const Header: React.FC = () => {
 
       {/* Main Navbar */}
       <div className="bg-white/95 dark:bg-[#121212]/95 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 md:h-18 flex items-center justify-between gap-1.5 sm:gap-2.5">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 md:h-18 flex items-center justify-between gap-0.5 min-[375px]:gap-1.5 sm:gap-2.5">
           
           {/* Brand Logo */}
           <button 
@@ -422,7 +422,7 @@ export const Header: React.FC = () => {
                 setMobileSearchVisible(prev => !prev);
                 setTimeout(() => mobileInputRef.current?.focus(), 100);
               }}
-              className="p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:text-[#0F9D58] hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors md:hidden"
+              className="p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:text-[#0F9D58] hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors max-[374px]:hidden md:hidden"
               title="Search"
             >
               <Search size={20} />

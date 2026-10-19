@@ -322,7 +322,7 @@ export const HomeView: React.FC = () => {
           </p>
         </div>
 
-        <div className={"grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 " + (featuredProducts.length === 1 ? "max-w-sm mx-auto w-full" : "")}>
+        <div className={"grid gap-6 " + (featuredProducts.length === 1 ? "grid-cols-1 max-w-sm mx-auto w-full" : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4")}>
           {featuredProducts.map((p, idx) => (
             <ProductCard key={p.id ? `${p.id}-${idx}` : `feat-${idx}`} product={p} />
           ))}
