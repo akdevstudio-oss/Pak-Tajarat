@@ -32,6 +32,7 @@ export function applySeoAndBrandingToHead(
 
   const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
   const routeSeo: Record<string, { title: string; description: string; robots?: string }> = {
+    '/': { title: 'Pak-Tijarat | Pakistan’s Trusted Digital Marketplace', description: 'Shop quality products across Pakistan with Pak-Tijarat. Explore available products, current prices, Cash on Delivery, and customer support.' },
     '/products': { title: 'Shop Products in Pakistan | Pak-Tijarat', description: 'Browse available products at Pak-Tijarat. Check current stock, prices and Cash on Delivery availability across Pakistan.' },
     '/shop': { title: 'Shop Products in Pakistan | Pak-Tijarat', description: 'Browse available products at Pak-Tijarat. Check current stock, prices and Cash on Delivery availability across Pakistan.' },
     '/about': { title: 'About Pak-Tijarat | Pakistan’s Trusted Digital Marketplace', description: 'Learn about Pak-Tijarat, our marketplace mission, seller support and online shopping services for customers across Pakistan.' },
@@ -73,11 +74,16 @@ export function applySeoAndBrandingToHead(
   setMeta('meta[property="og:title"]', 'property', 'og:title', seoConfig?.ogTitle || title);
   setMeta('meta[property="og:description"]', 'property', 'og:description', route?.description || seoConfig?.ogDescription || description);
   setMeta('meta[property="og:type"]', 'property', 'og:type', seoConfig?.ogType || 'website');
-  setMeta('meta[property="og:image"]', 'property', 'og:image', seoConfig?.ogImage || brandingConfig?.ogImageUrl || brandingConfig?.defaultSeoImageUrl);
+  const configuredShareImage = seoConfig?.ogImage || brandingConfig?.ogImageUrl || brandingConfig?.defaultSeoImageUrl;
+  const brandedShareImage = 'https://pak-tajarat.store/android-chrome-512x512.png';
+  const shareImage = configuredShareImage && !/images\\.unsplash\\.com/i.test(configuredShareImage) ? configuredShareImage : brandedShareImage;
+  setMeta('meta[property="og:image"]', 'property', 'og:image', shareImage);
   setMeta('meta[name="twitter:card"]', 'name', 'twitter:card', seoConfig?.twitterCard || 'summary_large_image');
   setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', seoConfig?.ogTitle || title);
   setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', route?.description || seoConfig?.ogDescription || description);
-  setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', seoConfig?.twitterImage || brandingConfig?.ogImageUrl || brandingConfig?.defaultSeoImageUrl);
+  const configuredTwitterImage = seoConfig?.twitterImage || configuredShareImage;
+  const twitterImage = configuredTwitterImage && !/images\\.unsplash\\.com/i.test(configuredTwitterImage) ? configuredTwitterImage : brandedShareImage;
+  setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', twitterImage);
 
   // Canonicals must follow the active SPA route, not remain stuck on the homepage.
   // Use one production host to avoid duplicate www/non-www URLs.
