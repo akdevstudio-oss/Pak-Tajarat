@@ -41,10 +41,9 @@ const AppContent: React.FC = () => {
   // Mount real-time live visitor and site-wide click tracker
   useLiveTrafficTracker(currentView, currentUser);
 
-  // Handle URL referral codes and cooling period check on mount
+  // Handle URL referral codes on mount. Commission processing requires an authenticated
+  // account; do not call its protected endpoint for anonymous visitors.
   React.useEffect(() => {
-    processCoolingCommissions();
-
     try {
       const searchParams = new URLSearchParams(window.location.search);
       const refCode = searchParams.get('ref') || searchParams.get('referral');
@@ -66,6 +65,15 @@ const AppContent: React.FC = () => {
       console.warn("URL referral param error:", err);
     }
   }, []);
+
+  // Process cooling commissions only for a signed-in account and handle session expiry
+  // quietly so an expected 401 never becomes an unhandled promise rejection.
+  React.useEffect(() => {
+    if (!currentUser) return;
+    processCoolingCommissions().catch((error) => {
+      console.debug('Affiliate commission sync skipped:', error instanceof Error ? error.message : error);
+    });
+  }, [currentUser?.id]);
 
   // Track which notifications should be displayed in the floating toasts
   const [visibleToasts, setVisibleToasts] = React.useState<string[]>([]);
