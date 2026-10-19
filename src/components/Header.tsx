@@ -208,7 +208,7 @@ export const Header: React.FC = () => {
 
       {/* Main Navbar */}
       <div className="bg-white/95 dark:bg-[#121212]/95 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 md:h-18 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 md:h-18 flex items-center justify-between gap-1.5 sm:gap-2.5">
           
           {/* Brand Logo */}
           <button 
@@ -262,7 +262,7 @@ export const Header: React.FC = () => {
           {/* Desktop & Tablet Search Bar (Prominently centered with ample width) */}
           <div 
             ref={desktopSearchRef}
-            className="hidden md:flex relative flex-1 min-w-[220px] max-w-xl mx-2 lg:mx-4"
+            className="hidden md:flex relative flex-1 min-w-[180px] max-w-md mx-1.5 lg:mx-2"
             id="desktop-search-container"
           >
             <form 
@@ -395,7 +395,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Desktop Navigation Links (Visible on large screens) */}
-          <div className="hidden xl:flex items-center space-x-5 shrink-0">
+          <div className="hidden xl:flex items-center space-x-3 shrink-0">
             <a 
               href="/"
               onClick={(e) => { e.preventDefault(); setCurrentView('home'); }} 
