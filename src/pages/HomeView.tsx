@@ -131,6 +131,9 @@ export const HomeView: React.FC = () => {
                   src={banners[activeBanner].image || undefined}
                   alt={banners[activeBanner].title}
                   className="w-full h-full object-cover"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -244,6 +247,8 @@ export const HomeView: React.FC = () => {
                 <img
                   src={p.image || undefined}
                   alt={p.name}
+                  loading="lazy"
+                  decoding="async"
                   className="w-24 h-24 object-cover rounded-xl border border-gray-100 dark:border-zinc-800 cursor-pointer"
                   onClick={() => viewProductDetails(p.id)}
                   referrerPolicy="no-referrer"
