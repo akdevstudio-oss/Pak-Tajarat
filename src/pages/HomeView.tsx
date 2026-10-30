@@ -29,11 +29,24 @@ export const HomeView: React.FC = () => {
   // Prefer the admin-managed CMS hero banners. The old implementation always
   // replaced them with the first catalog product, so admin uploads never appeared.
   const currentTime = Date.now();
+  // Date-only end dates are inclusive: keep a banner visible through the full
+  // selected end date instead of expiring it at midnight at the start of that day.
+  const getBannerDateTime = (value?: string, endOfDay = false) => {
+    if (!value) return null;
+    const dateOnly = /^\\d{4}-\\d{2}-\\d{2}$/.test(value);
+    const normalized = dateOnly
+      ? `${value}T${endOfDay ? '23:59:59.999' : '00:00:00'}`
+      : value;
+    const timestamp = Date.parse(normalized);
+    return Number.isNaN(timestamp) ? null : timestamp;
+  };
   const publishedCmsBanners = heroBanners
     .filter(banner => {
       const enabled = banner.isEnabled ?? true;
-      const started = !banner.startDate || Number.isNaN(Date.parse(banner.startDate)) || Date.parse(banner.startDate) <= currentTime;
-      const notExpired = !banner.endDate || Number.isNaN(Date.parse(banner.endDate)) || Date.parse(banner.endDate) >= currentTime;
+      const startTime = getBannerDateTime(banner.startDate);
+      const endTime = getBannerDateTime(banner.endDate, true);
+      const started = startTime === null || startTime <= currentTime;
+      const notExpired = endTime === null || endTime >= currentTime;
       return enabled && started && notExpired && Boolean(banner.image || banner.imageUrl);
     })
     .slice()
