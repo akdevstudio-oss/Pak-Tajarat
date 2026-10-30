@@ -112,7 +112,7 @@ const AppContent: React.FC = () => {
         setCurrentView('admin-login');
       } else if (path === '/pkadmin/dashboard' || path === '/admin-dashboard' || path === '/admin/dashboard') {
         setCurrentView('admin-dashboard');
-      } else if (path === '/products') {
+      } else if (path === '/products' || path === '/shop') {
         setCurrentView('products');
       } else if (path === '/cart') {
         setCurrentView('cart');
