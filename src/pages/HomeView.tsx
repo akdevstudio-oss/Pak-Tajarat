@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 export const HomeView: React.FC = () => {
-  const { products, setCurrentView, viewProductDetails, heroBanners, blogs } = useApp();
+  const { products, isProductsLoading, setCurrentView, viewProductDetails, heroBanners, blogs } = useApp();
 
   const now = Date.now();
   const activeProducts = products.filter(p => {
@@ -60,16 +60,21 @@ export const HomeView: React.FC = () => {
           badge: "MADE FOR YOUR NEXT MOVE"
         }]
       : [{
-          id: 'empty-catalog',
-          title: "Pak-Tijarat",
+          id: isProductsLoading ? 'loading-catalog' : 'empty-catalog',
+          title: isProductsLoading ? "Discover Pak-Tijarat" : "Shop with Pak-Tijarat",
           subtitle: "Pakistan's Trusted Digital Marketplace",
-          description: "Our next products will be added by the store admin.",
+          description: isProductsLoading
+            ? "Loading the latest products from our store. Please wait a moment."
+            : "Explore our marketplace and check back as new products are added.",
           gradient: "from-emerald-800 to-teal-950",
           image: "",
-          badge: "COMING SOON"
+          badge: isProductsLoading ? "LOADING STORE" : "WELCOME TO PAK-TIJARAT"
         }];
 
   const [activeBanner, setActiveBanner] = useState(0);
+
+  // Keep the selected slide valid when CMS banners are refreshed.
+  useEffect(() => { setActiveBanner(0); }, [publishedCmsBanners.length]);
 
   // Auto-slide effect for banner images
   useEffect(() => {
