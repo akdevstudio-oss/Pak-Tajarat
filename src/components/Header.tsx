@@ -492,7 +492,7 @@ export const Header: React.FC = () => {
               {/* Notifications Popover */}
               {showNotifications && (
                 <div 
-                  className="fixed left-2 right-2 top-1/2 -translate-y-1/2 mx-auto w-auto max-w-md max-h-[calc(100dvh-2rem)] bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xl z-[60] overflow-hidden flex flex-col md:absolute md:left-auto md:right-0 md:top-full md:translate-y-0 md:mt-3 md:mx-0 md:w-80 md:max-w-[calc(100vw-1rem)] md:max-h-[70vh]"
+                  className="fixed inset-x-2 top-1/2 -translate-y-1/2 mx-auto box-border w-[calc(100vw-1rem)] max-w-md max-h-[calc(100dvh-2rem)] bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-2xl z-[60] overflow-hidden flex flex-col md:absolute md:left-auto md:right-0 md:top-full md:translate-y-0 md:mt-3 md:mx-0 md:w-80 md:max-w-[calc(100vw-1rem)] md:max-h-[70vh]"
                   
                 >
                   <div className="p-4 bg-gray-50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center">
@@ -535,8 +535,8 @@ export const Header: React.FC = () => {
                             </span>
                             <span className="text-[10px] text-gray-400">{n.date}</span>
                           </div>
-                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">{n.title}</h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{n.message}</p>
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5 break-words [overflow-wrap:anywhere]">{n.title}</h4>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed break-words [overflow-wrap:anywhere]">{n.message}</p>
                         </div>
                       ))
                     )}
