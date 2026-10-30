@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 
 export interface ProductsContextType {
   products: Product[];
+  isProductsLoading: boolean;
   addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
   editProduct: (product: Product) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
@@ -34,6 +35,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { addNotification } = useUI();
   const { currentUser } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
+  const [isProductsLoading, setIsProductsLoading] = useState(true);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [wishlist, setWishlist] = useState<string[]>(() => readList('pak_tajarat_wishlist'));
   const [compareList, setCompareList] = useState<string[]>(() => readList('pak_tajarat_compare'));
@@ -46,11 +48,15 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (!response.ok) throw new Error(await apiError(response));
         return response.json();
       })
-      .then(data => { if (active && Array.isArray(data.products)) setProducts(data.products); })
+      .then(data => {
+        if (active && Array.isArray(data.products)) setProducts(data.products);
+        else if (active) throw new Error('Product API returned an invalid response.');
+      })
       .catch(error => {
         console.error('MongoDB product list unavailable:', error);
         if (active) setProducts([]);
-      });
+      })
+      .finally(() => { if (active) setIsProductsLoading(false); });
     return () => { active = false; };
   }, []);
 
@@ -120,7 +126,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   return (
     <ProductsContext.Provider value={{
-      products, addProduct, editProduct, deleteProduct, updateStock, clearAndResetDefaultProducts,
+      products, isProductsLoading, addProduct, editProduct, deleteProduct, updateStock, clearAndResetDefaultProducts,
       reviews, addReview, wishlist, toggleWishlist, isInWishlist: (id) => wishlist.includes(id),
       compareList, toggleCompare, isInCompare: (id) => compareList.includes(id),
       recentlyViewed, addToRecentlyViewed
