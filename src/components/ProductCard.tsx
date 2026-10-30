@@ -46,7 +46,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           onClick={() => viewProductDetails(product.id)}
           referrerPolicy="no-referrer"
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560343090-f0409e92791a?auto=format&fit=crop&w=600&q=80';
+            const image = e.currentTarget as HTMLImageElement;
+            if (!image.dataset.fallbackApplied) {
+              image.dataset.fallbackApplied = 'true';
+              image.src = '/android-chrome-512x512.png';
+            }
           }}
         />
 
