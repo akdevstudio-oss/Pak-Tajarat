@@ -33,7 +33,7 @@ export const HomeView: React.FC = () => {
   // selected end date instead of expiring it at midnight at the start of that day.
   const getBannerDateTime = (value?: string, endOfDay = false) => {
     if (!value) return null;
-    const dateOnly = /^\\d{4}-\\d{2}-\\d{2}$/.test(value);
+    const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
     const normalized = dateOnly
       ? `${value}T${endOfDay ? '23:59:59.999' : '00:00:00'}`
       : value;
