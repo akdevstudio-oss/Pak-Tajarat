@@ -153,7 +153,7 @@ export const TermsView: React.FC = () => {
                 <li><strong>Prices aur Currency:</strong> Product prices Pakistani Rupees (PKR) mein show ki jati hain. Order confirm karne se pehle checkout par total amount aur applicable delivery charges check karein.</li>
                 <li><strong>Cash on Delivery (COD) Verification:</strong> COD orders ke liye customer ko courier partner ki confirmation call answer karna ya WhatsApp verify karna lazmi hai. Payment rider ko parcel lete waqt karni hai.</li>
                 <li><strong>Delivery:</strong> Orders TCS, Leopard ya kisi available courier partner ke zariye bheje ja sakte hain. Delivery time aur charges destination aur courier service ke mutabiq farq ho sakte hain; checkout ya support se confirm karein.</li>
-                <li><strong>Fake Orders:</strong> Jhootay orders ya bilawajah delivery reject karne par account ko permanent blacklist kar diya jaye ga.</li>
+                <li><strong>Fake Orders:</strong> Fraudulent ya repeated abusive orders par Pak-Tajarat future orders ko restrict ya decline kar sakta hai.</li>
               </ul>
             </section>
 
@@ -163,7 +163,7 @@ export const TermsView: React.FC = () => {
                 Affiliate Partner Sharaait (Affiliate Rules)
               </h3>
               <ul className="list-disc pl-6 space-y-2">
-                <li><strong>Eligibility:</strong> Koi bhi registered user Pak-Tajarat Affiliate Partner ban sakta hai.</li>
+                <li><strong>Eligibility:</strong> Registered users Affiliate Partner banne ke liye apply kar sakte hain; approval zaroori hai.</li>
                 <li><strong>Commissions:</strong> Referral links se honay wali har successful sale par customer order complete hone par commission credit hoti hai.</li>
                 <li><strong>Payout Withdrawals:</strong> Delivered orders ki commission 7-day return period ke baad final hoti hai. Approved payouts JazzCash, EasyPaisa ya direct bank transfer ke zariye process kiye ja sakte hain.</li>
                 <li><strong>Mamnooa Tareeqay:</strong> Fake accounts se self-referral, spamming ya galat claims karna strictly prohibited hai. Aisa karne par account aur pending commission forfeit kar di jaye gi.</li>
@@ -201,7 +201,7 @@ export const TermsView: React.FC = () => {
                 <li><strong>Currency & Pricing:</strong> All prices listed on Pak-Tajarat are in Pakistani Rupees (PKR) and are inclusive of standard taxes where applicable. Shipping costs are displayed at checkout.</li>
                 <li><strong>Cash on Delivery (COD):</strong> For COD orders, customers must confirm phone verification calls or WhatsApp prompts from our logistics partners. Delivery riders will collect payment upon parcel drop-off.</li>
                 <li><strong>Delivery:</strong> Orders may be dispatched through TCS, Leopard, or another available courier partner. Delivery time and charges depend on the destination and courier service; confirm the estimate at checkout or with support.</li>
-                <li><strong>False Orders & Address Abuse:</strong> Intentional placement of false orders or refusing delivery without valid cause may result in temporary or permanent blacklist status across our logistics network.</li>
+                <li><strong>False Orders & Address Abuse:</strong> Repeated fraudulent orders or abusive delivery refusals may result in Pak-Tajarat restricting or declining future orders.</li>
               </ul>
             </section>
 
@@ -282,7 +282,7 @@ export const RefundView: React.FC = () => {
             <section className="space-y-2 bg-gray-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
               <h3 className="text-base font-black text-gray-900 dark:text-white">1. 7-Din Aasaan Wapsi (7-Day Easy Returns)</h3>
               <p>
-                Hum tamam products par 7-Day Return Guarantee dete hain. Agar aap ko milnay wala product defective, damaged ya specification se mukhtalif ho, toh 7 din ke andar WhatsApp (+92 326 1604808) par rabta karke wapsi initiate karein.
+                Return request ke liye delivery ke 7 din ke andar WhatsApp (+92 326 1604808) par order number aur return ki wajah ke saath rabta karein. Support team request review karke eligibility aur return instructions confirm karegi.
               </p>
             </section>
 
@@ -395,7 +395,7 @@ export const FaqView: React.FC = () => {
       id: 'q1',
       category: 'shopping',
       question: 'What is Pak-Tajarat and how does it work?',
-      answer: 'Pak-Tajarat is Pakistan\'s premier e-commerce marketplace and affiliate network. You can shop top-quality electronics, fashion, beauty, and home essentials with nationwide Cash on Delivery, or join our Affiliate program to earn commissions on shared sales.'
+      answer: 'Pak-Tajarat is a Pakistan-focused online store. Browse the products currently listed in the catalogue, review their details and availability, and contact support if you need help.'
     },
     {
       id: 'q2',
