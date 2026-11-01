@@ -51,7 +51,7 @@ export const PrivacyView: React.FC = () => {
         <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
           {isRomanEnglish ? 'Privacy Policy (رازداری کی پالیسی)' : 'Privacy Policy'}
         </h1>
-        <p className="text-xs text-gray-400">Pak-Tajarat E-Commerce & Affiliate Network • Last Updated: June 30, 2026</p>
+        <p className="text-xs text-gray-400">Pak-Tajarat E-Commerce & Affiliate Network • Last Updated: November 2, 2026</p>
       </div>
 
       <div className="space-y-6 text-sm text-gray-600 dark:text-zinc-300 leading-relaxed">
@@ -60,21 +60,21 @@ export const PrivacyView: React.FC = () => {
             <section className="space-y-2 bg-gray-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
               <h3 className="text-base font-black text-gray-900 dark:text-white">1. Information Collection (Aap ki Maloomat ki Hifazat)</h3>
               <p>
-                Pak-Tajarat par aap ka personal data poori tarah mehfooz hai. Hum aap ka naam, delivery address, email aur phone number sirf checkout calculations aur parcel dispatch karne ke liye istemal kartay hain. Hum aap ki kisi maloomat ko teesri party ad networks ke sath share ya sell nahi kartay.
+                Pak-Tajarat aap ka naam, email, phone number, delivery address, account/order details aur support messages ko account, order processing, courier delivery, returns aur customer support ke liye istemal kar sakta hai. Delivery ke liye zaroori details mutaliqa courier partner ke saath share ki ja sakti hain.
               </p>
             </section>
 
             <section className="space-y-2">
               <h3 className="text-base font-black text-gray-900 dark:text-white">2. Affiliate Referral Tracking (Commission Tracking)</h3>
               <p>
-                Jab aap kisi Affiliate partner link ke zariye khareedari kartay hain, toh hum session cookies aur identifiers (`ref` parameter) istemal kartay hain taake referral commission sahi account mein credit ho sakay. Order hone par yeh automatic clear ho jata hai.
+                Affiliate referral links aur browser storage cart, wishlist, language/preferences aur referral attribution yaad rakhne ke liye istemal ho sakte hain. Browser storage clear karne se kuch saved preferences ya referral features mutasir ho sakte hain.
               </p>
             </section>
 
             <section className="space-y-2 bg-gray-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
               <h3 className="text-base font-black text-gray-900 dark:text-white">3. Security & Safety (Data Security)</h3>
               <p>
-                Tamam important information encrypted Firebase Firestore servers par store hoti hai. Transactions audited hotay hain taake har customer ke credentials aur account details safe rahein.
+                Website ka application data MongoDB Atlas mein, jabke uploaded website aur product media Cloudflare R2 mein store hota hai. Website hosting aur API Vercel par chalti hain. In providers ko service chalane ke liye zaroori data process karna par sakta hai. Hum access controls istemal karte hain, lekin koi bhi online service absolute security ki guarantee nahi de sakti.
               </p>
             </section>
           </>
@@ -83,21 +83,21 @@ export const PrivacyView: React.FC = () => {
             <section className="space-y-2 bg-gray-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
               <h3 className="text-base font-black text-gray-900 dark:text-white">1. Information Collection & Privacy</h3>
               <p>
-                At Pak-Tajarat, we prioritize your data privacy and security. We collect delivery details including full name, shipping address, email address, and phone number strictly for checkout processing, order verification, and parcel dispatch. We do not sell, exchange, or distribute your personal details to third-party ad networks.
+                Pak-Tajarat may process information you provide, including your name, email address, phone number, delivery address, account and order details, and support messages. We use this information to manage accounts, process orders, arrange courier delivery, handle return requests, and provide support. Necessary delivery details may be shared with the courier partner fulfilling your order.
               </p>
             </section>
 
             <section className="space-y-2">
               <h3 className="text-base font-black text-gray-900 dark:text-white">2. Affiliate Referral Tracking</h3>
               <p>
-                When purchasing products through an Affiliate partner network link, session-level cookies and URL tracking parameters (such as `ref`) are used to credit commission points accurately to the referring associate. These cookies track anonymous navigational events and automatically clear upon checkout.
+                Referral links and limited browser storage may be used to remember affiliate attribution, cart items, wishlist entries, and site preferences. Clearing browser storage may affect these saved features.
               </p>
             </section>
 
             <section className="space-y-2 bg-gray-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
               <h3 className="text-base font-black text-gray-900 dark:text-white">3. Cloud Security & Encryption</h3>
               <p>
-                All sensitive information is stored securely on encrypted Firebase Firestore cloud infrastructure protected by strict security rules. Payment transactions and account operations are regularly audited to defend shopper credentials against unauthorized access.
+                Application data is handled through MongoDB Atlas, uploaded website and product media through Cloudflare R2, and website hosting and API delivery through Vercel. These providers may process the information needed to operate the store. Access controls are used and service credentials are kept server-side, but no online service can guarantee absolute security.
               </p>
             </section>
           </>
@@ -128,7 +128,7 @@ export const TermsView: React.FC = () => {
         <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
           {isRomanEnglish ? 'Terms & Conditions (قواعد و ضوابط)' : 'Terms & Conditions'}
         </h1>
-        <p className="text-xs text-gray-400">Pak-Tajarat E-Commerce & Affiliate Network • Effective Date: June 30, 2026</p>
+        <p className="text-xs text-gray-400">Pak-Tajarat E-Commerce & Affiliate Network • Effective Date: November 2, 2026</p>
       </div>
 
       <div className="space-y-8 text-sm text-gray-600 dark:text-zinc-300 leading-relaxed">
@@ -150,9 +150,9 @@ export const TermsView: React.FC = () => {
                 Shopping aur Cash on Delivery (COD) Rules
               </h3>
               <ul className="list-disc pl-6 space-y-2">
-                <li><strong>Prices aur Currency:</strong> Pak-Tajarat par tamam product prices Pakistani Rupee (PKR) mein hain aur tamam taxes included hain. Shipping charges checkout par show hotay hain.</li>
+                <li><strong>Prices aur Currency:</strong> Product prices Pakistani Rupees (PKR) mein show ki jati hain. Order confirm karne se pehle checkout par total amount aur applicable delivery charges check karein.</li>
                 <li><strong>Cash on Delivery (COD) Verification:</strong> COD orders ke liye customer ko courier partner ki confirmation call answer karna ya WhatsApp verify karna lazmi hai. Payment rider ko parcel lete waqt karni hai.</li>
-                <li><strong>Delivery Timeframe:</strong> Pakistan ke tamam bare shehron (Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Sialkot, Peshawar, Quetta, Multan) mein delivery 2 se 4 business days mein ho jati hai.</li>
+                <li><strong>Delivery:</strong> Orders TCS, Leopard ya kisi available courier partner ke zariye bheje ja sakte hain. Delivery time aur charges destination aur courier service ke mutabiq farq ho sakte hain; checkout ya support se confirm karein.</li>
                 <li><strong>Fake Orders:</strong> Jhootay orders ya bilawajah delivery reject karne par account ko permanent blacklist kar diya jaye ga.</li>
               </ul>
             </section>
@@ -176,7 +176,7 @@ export const TermsView: React.FC = () => {
                 7-Din Aasaan Wapsi (Returns Guarantee)
               </h3>
               <p>
-                Hum apne tamam catalog items par 7-Day Hassle-Free Return & Exchange guarantee dete hain. Product damaged hone par delivery ke 7 din ke andar WhatsApp (+92 326 1604808) par rabta karke refund ya exchange paayein.
+                Return request ke liye delivery ke 7 din ke andar WhatsApp (+92 326 1604808) par order number aur return ki wajah ke saath rabta karein. Support team eligibility review karke return instructions aur available resolution confirm karegi. Instructions milne se pehle parcel wapas na bhejein.
               </p>
             </section>
           </>
@@ -200,7 +200,7 @@ export const TermsView: React.FC = () => {
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Currency & Pricing:</strong> All prices listed on Pak-Tajarat are in Pakistani Rupees (PKR) and are inclusive of standard taxes where applicable. Shipping costs are displayed at checkout.</li>
                 <li><strong>Cash on Delivery (COD):</strong> For COD orders, customers must confirm phone verification calls or WhatsApp prompts from our logistics partners. Delivery riders will collect payment upon parcel drop-off.</li>
-                <li><strong>Order Fulfillment:</strong> Deliveries across major Pakistani cities (Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Sialkot, Peshawar, Quetta, Multan) typically arrive within 2 to 4 business days. Remote areas may require additional time.</li>
+                <li><strong>Delivery:</strong> Orders may be dispatched through TCS, Leopard, or another available courier partner. Delivery time and charges depend on the destination and courier service; confirm the estimate at checkout or with support.</li>
                 <li><strong>False Orders & Address Abuse:</strong> Intentional placement of false orders or refusing delivery without valid cause may result in temporary or permanent blacklist status across our logistics network.</li>
               </ul>
             </section>
@@ -224,7 +224,7 @@ export const TermsView: React.FC = () => {
                 Returns & Quality Guarantee
               </h3>
               <p>
-                We stand behind the quality of all catalog items with a 7-day hassle-free return and exchange guarantee. If an item arrives damaged, defective, or misdescribed, customers may contact support via WhatsApp (+92 326 1604808) within 7 days of delivery for a replacement or full refund.
+                To request a return, contact support on WhatsApp (+92 326 1604808) within 7 days of delivery and provide your order number and reason. Support will review eligibility and confirm the return instructions and available resolution. Please do not send an item back before receiving instructions.
               </p>
             </section>
           </>
@@ -241,7 +241,7 @@ export const TermsView: React.FC = () => {
           <div className="text-xs font-bold space-y-1 text-gray-800 dark:text-zinc-200">
             <p>• WhatsApp Support: +92 326 1604808</p>
             <p>• Official Email: alikhanxada1001@gmail.com</p>
-            <p>• Head Office: Blue Area, Sector F-6, Islamabad, Pakistan</p>
+            
           </div>
         </section>
       </div>
@@ -273,7 +273,7 @@ export const RefundView: React.FC = () => {
         <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
           {isRomanEnglish ? 'Refund & Return Policy (واپسی اور ریفنڈ)' : 'Refund & Return Policy'}
         </h1>
-        <p className="text-xs text-gray-400">Pak-Tajarat E-Commerce & Affiliate Network • Last Updated: June 30, 2026</p>
+        <p className="text-xs text-gray-400">Pak-Tajarat E-Commerce & Affiliate Network • Last Updated: November 2, 2026</p>
       </div>
 
       <div className="space-y-6 text-sm text-gray-600 dark:text-zinc-300 leading-relaxed">
@@ -289,7 +289,7 @@ export const RefundView: React.FC = () => {
             <section className="space-y-2">
               <h3 className="text-base font-black text-gray-900 dark:text-white">2. Refund Processing (Raqam ki Wapsi)</h3>
               <p>
-                Product warehouse mein wapis check hone par, aap ka refund direct aap ke EasyPaisa, JazzCash ya Bank Account mein transfer kar diya jata hai. Product ka original box aur tags intact hone chahiye.
+                Returned product receive aur inspect hone ke baad, agar request approve hoti hai, toh support team refund ya exchange ka tareeqa confirm karegi. Return bhejne se pehle support se instructions lena zaroori hai.
               </p>
             </section>
 
@@ -305,14 +305,14 @@ export const RefundView: React.FC = () => {
             <section className="space-y-2 bg-gray-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
               <h3 className="text-base font-black text-gray-900 dark:text-white">1. 7-Day Easy Returns Guarantee</h3>
               <p>
-                We offer a comprehensive, hassle-free 7-day return policy on all catalog listings. If you receive an item that is defective, damaged, or mismatched from specifications, contact us via WhatsApp (+92 326 1604808) within 7 days to initiate returns.
+                To request a return, contact WhatsApp support (+92 326 1604808) within 7 days of delivery, provide your order number and explain the reason. Our team will review the request, confirm eligibility, and share the return instructions before you send the item back.
               </p>
             </section>
 
             <section className="space-y-2">
               <h3 className="text-base font-black text-gray-900 dark:text-white">2. Direct Refund Disbursement</h3>
               <p>
-                Refund payments are disbursed directly to your specified EasyPaisa, JazzCash, or bank account credentials once our warehouse verifies the returned item's condition. The item must remain complete with its original boxed packaging and tags intact.
+                After an approved return is received and inspected, support will confirm the available refund or exchange arrangement and expected timing. Please wait for return instructions before dispatching an item.
               </p>
             </section>
 
@@ -356,37 +356,37 @@ export const FaqView: React.FC = () => {
       id: 'q1',
       category: 'shopping',
       question: 'Pak-Tajarat kya hai aur yeh kaise kaam karta hai?',
-      answer: 'Pak-Tajarat Pakistan ka ek trusted digital marketplace aur affiliate platform hai. Yahan aap electronics, fashion, beauty aur home accessories ki online shopping kar sakte hain, aur ba-asani hamara Affiliate partner ban kar har successful sale par behtareen commission kama sakte hain.'
+      answer: 'Pak-Tajarat Pakistan-focused online store hai. Website par jo products is waqt catalogue mein listed hain, aap unki details aur availability check karke order kar sakte hain.'
     },
     {
       id: 'q2',
       category: 'shopping',
       question: 'Delivery charges kitne hain aur parcel kitne din mein milega?',
-      answer: 'Poore Pakistan mein delivery 2 se 4 working days ke andar ki jati hai. Islamabad/Rawalpindi mein delivery mazeed jaldi ho jati hai. Standard delivery charges order details aur location ke mutabiq checkout screen par clear dikhaye jate hain.'
+      answer: 'Orders TCS, Leopard ya available courier partner ke zariye bheje ja sakte hain. Delivery time aur charges aap ke shehar aur courier service par depend karte hain; checkout ya WhatsApp support par confirm karein.'
     },
     {
       id: 'q3',
       category: 'shopping',
       question: 'Kya Cash on Delivery (COD) ki sahulat maujood hai?',
-      answer: 'Ji haan! Hum poore Pakistan mein Cash on Delivery (COD) ki complete sahulat faraham karte hain. Jab parcel aapko mile, tabhi aapne payment rider ko karni hai, taake aapka aitmad aur paisa dono mehfooz rahein.'
+      answer: 'Ji haan, Cash on Delivery available hai jahan checkout par option show ho. Order place karne se pehle apne address ke liye COD availability confirm kar lein.'
     },
     {
       id: 'q4',
       category: 'affiliate',
       question: 'Affiliate Partner banne ki kya fees hai aur kaise join karein?',
-      answer: 'Pak-Tajarat Affiliate Partner program bilkul FREE hai! Koi hidden fees ya registration charges nahi hain. Bas apna account create karein, Profile Section mein "Become an Affiliate" par click karke details submit karein, aur approval ke baad apna kamao referral link hasil karein.'
+      answer: 'Affiliate program ke liye apply karne ke baad approval ka intezar karein. Approved partners ko product media aur referral details mil sakti hain; stock pehle khareedna zaroori nahi.'
     },
     {
       id: 'q5',
       category: 'affiliate',
       question: 'Apni affiliate commission kaise withdraw karwa sakte hain?',
-      answer: 'Aapki kamayi hui commission direct aapke EasyPaisa, JazzCash ya Bank Account mein send ki jati hai. Bas apne dashboard par ja kar withdrawal request submit karein, aur hamari finance team 24 working hours ke andar aapko direct payment transfer kar degi.'
+      answer: 'Affiliate commission delivered order ke 7-day return period ke baad final hoti hai. Approved payouts JazzCash, EasyPaisa ya bank transfer ke zariye process kiye ja sakte hain; processing time support se confirm karein.'
     },
     {
       id: 'q6',
       category: 'returns',
       question: 'Agar product pasand na aye ya defective ho toh kya return ho sakta hai?',
-      answer: 'Ji haan, hum 7-Day Easy Return & Refund guarantee dete hain! Agar aapko product damaged ya specifications se mukhtalif mile, toh 7 din ke andar hamare official WhatsApp (+92 326 1604808) par rabta karein. Parcel return hone par aapko aapki raqam EasyPaisa ya JazzCash par wapis mil jayegi.'
+      answer: 'Delivery ke 7 din ke andar WhatsApp (+92 326 1604808) par order number aur return ki wajah ke saath request bhejein. Support team request review karke eligibility aur return instructions confirm karegi.'
     }
   ];
 
@@ -401,31 +401,31 @@ export const FaqView: React.FC = () => {
       id: 'q2',
       category: 'shopping',
       question: 'What are the delivery charges and shipping times across Pakistan?',
-      answer: 'Nationwide delivery across major Pakistani cities takes 2 to 4 business days. Express delivery is available for Islamabad and Rawalpindi. Shipping fees are calculated and clearly shown during checkout.'
+      answer: 'Orders may be dispatched through TCS, Leopard, or another available courier partner. Delivery times and charges depend on the destination and courier; confirm the estimate at checkout or with support.'
     },
     {
       id: 'q3',
       category: 'shopping',
       question: 'Is Cash on Delivery (COD) available nationwide?',
-      answer: 'Yes! We offer 100% Cash on Delivery (COD) services across all cities and towns in Pakistan. You only pay the courier rider upon physical inspection of parcel drop-off.'
+      answer: 'Cash on Delivery is available where it is offered at checkout. Confirm availability for your delivery address before placing the order.'
     },
     {
       id: 'q4',
       category: 'affiliate',
       question: 'Are there any fees to join the Pak-Tajarat Affiliate Program?',
-      answer: 'Joining the Pak-Tajarat Affiliate Program is completely FREE with zero registration fees or hidden charges. Simply create an account, apply in your Profile Dashboard, and start sharing your custom referral links.'
+      answer: 'Apply through your account and wait for approval. Approved partners can promote listed products without purchasing stock upfront; commission terms are shown through the affiliate programme.'
     },
     {
       id: 'q5',
       category: 'affiliate',
       question: 'How do I withdraw my earned affiliate commissions?',
-      answer: 'Approved commissions are transferred directly to your JazzCash, EasyPaisa, or Pakistani Bank Account. Submit a withdrawal request from your Affiliate Portal, and funds are disbursed within 24 working hours.'
+      answer: 'Affiliate commissions are finalized after an order is delivered and its 7-day return period has passed. Approved payouts can be made through JazzCash, EasyPaisa, or bank transfer; ask support about processing time.'
     },
     {
       id: 'q6',
       category: 'returns',
       question: 'What is the return and refund policy for damaged products?',
-      answer: 'We provide a 7-Day Hassle-Free Return & Refund Guarantee. If your product arrives damaged or defective, contact our WhatsApp support (+92 326 1604808) within 7 days for an immediate exchange or full refund.'
+      answer: 'To request a return, contact WhatsApp support (+92 326 1604808) within 7 days of delivery with your order number and reason. Support will review eligibility and send return instructions before the item is dispatched.'
     }
   ];
 
