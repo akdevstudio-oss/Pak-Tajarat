@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Logo } from './Logo';
 import { 
-  Phone, Mail, MapPin, MessageSquare, ShieldCheck, 
-  Truck, RotateCcw, Award, CheckCircle, ArrowUp,
+  Phone, Mail, MessageSquare, ShieldCheck, 
+  Truck, RotateCcw, CheckCircle, ArrowUp,
   Handshake
 } from 'lucide-react';
 
@@ -110,8 +110,8 @@ export const Footer: React.FC = () => {
             <Truck size={24} />
           </div>
           <div>
-            <h4 className="font-bold text-white text-sm">Swift Delivery</h4>
-            <p className="text-xs text-zinc-400 mt-1">Across Pakistan in 2-4 business days.</p>
+            <h4 className="font-bold text-white text-sm">Courier Delivery</h4>
+            <p className="text-xs text-zinc-400 mt-1">Dispatched through available courier partners.</p>
           </div>
         </div>
 
@@ -120,8 +120,8 @@ export const Footer: React.FC = () => {
             <ShieldCheck size={24} />
           </div>
           <div>
-            <h4 className="font-bold text-white text-sm">100% Secure Checkout</h4>
-            <p className="text-xs text-zinc-400 mt-1">Cash on Delivery & protected card payments.</p>
+            <h4 className="font-bold text-white text-sm">Cash on Delivery</h4>
+            <p className="text-xs text-zinc-400 mt-1">Available on eligible orders; check checkout.</p>
           </div>
         </div>
 
@@ -130,18 +130,18 @@ export const Footer: React.FC = () => {
             <RotateCcw size={24} />
           </div>
           <div>
-            <h4 className="font-bold text-white text-sm">7-Day Easy Returns</h4>
-            <p className="text-xs text-zinc-400 mt-1">Hassle-free 100% money back returns.</p>
+            <h4 className="font-bold text-white text-sm">7-Day Return Requests</h4>
+            <p className="text-xs text-zinc-400 mt-1">Contact support within 7 days and share your reason.</p>
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row items-center md:items-start space-y-2 md:space-y-0 md:space-x-4">
           <div className="p-3 bg-zinc-800/80 text-[#0F9D58] rounded-2xl">
-            <Award size={24} />
+            <CheckCircle size={24} />
           </div>
           <div>
-            <h4 className="font-bold text-white text-sm">Genuine Products</h4>
-            <p className="text-xs text-zinc-400 mt-1">100% authentic items straight from brands.</p>
+            <h4 className="font-bold text-white text-sm">Product Information</h4>
+            <p className="text-xs text-zinc-400 mt-1">Review current photos, specifications and price before ordering.</p>
           </div>
         </div>
       </div>
@@ -173,7 +173,7 @@ export const Footer: React.FC = () => {
             )}
           </div>
           <p className="text-sm text-zinc-400 leading-relaxed">
-            Pakistan's trusted digital gateway to premium lifestyle products, state-of-the-art electronics, local design houses, and reliable grocery. Quality checked, carefully packed, and delivered right to your door.
+            A Pakistan-focused online store with an admin-managed product catalogue. Browse current products, review their details, and contact support before ordering.
           </p>
           {/* Verified contact channels; do not link to generic social-media homepages */}
           <div className="pt-2 flex items-center space-x-3 text-zinc-400">
@@ -328,10 +328,6 @@ export const Footer: React.FC = () => {
               <Mail size={16} className="mr-2.5 text-[#0F9D58] shrink-0" />
               <span className="truncate">alikhanxada1001@gmail.com</span>
             </a>
-            <p className="flex items-start">
-              <MapPin size={16} className="mr-2.5 text-[#0F9D58] mt-0.5 shrink-0" />
-              <span>Blue Area, Sector F-6, Islamabad, Pakistan</span>
-            </p>
           </div>
           <div className="pt-2 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
             Easy Payout Partners
@@ -351,7 +347,7 @@ export const Footer: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-3 text-center sm:text-left">
             <p>© Pak-Tajarat. All Rights Reserved.</p>
             <span className="hidden sm:inline text-zinc-700">•</span>
-            <p className="text-zinc-400 font-medium">Created by <span className="text-[#0F9D58] font-bold">Ali Khanxada</span></p>
+            <p className="text-zinc-400 font-medium">Built by <span className="text-[#0F9D58] font-bold">AK Dev Studio</span></p>
           </div>
           
           <div className="flex items-center space-x-4">
