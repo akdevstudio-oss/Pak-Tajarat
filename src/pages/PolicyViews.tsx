@@ -165,7 +165,7 @@ export const TermsView: React.FC = () => {
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Eligibility:</strong> Koi bhi registered user Pak-Tajarat Affiliate Partner ban sakta hai.</li>
                 <li><strong>Commissions:</strong> Referral links se honay wali har successful sale par customer order complete hone par commission credit hoti hai.</li>
-                <li><strong>Payout Withdrawals:</strong> Kamayi hui commission JazzCash, EasyPaisa ya direct Bank Account mein minimum Rs. 1,000 hone par withdraw karwayein.</li>
+                <li><strong>Payout Withdrawals:</strong> Delivered orders ki commission 7-day return period ke baad final hoti hai. Approved payouts JazzCash, EasyPaisa ya direct bank transfer ke zariye process kiye ja sakte hain.</li>
                 <li><strong>Mamnooa Tareeqay:</strong> Fake accounts se self-referral, spamming ya galat claims karna strictly prohibited hai. Aisa karne par account aur pending commission forfeit kar di jaye gi.</li>
               </ul>
             </section>
@@ -213,7 +213,7 @@ export const TermsView: React.FC = () => {
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Eligibility:</strong> Any registered account holder in good standing may apply to become a Pak-Tajarat Affiliate Partner. Applications are subject to manual verification.</li>
                 <li><strong>Commissions:</strong> Affiliates earn commission rates on completed, non-returned customer orders placed via their unique referral link or referral code.</li>
-                <li><strong>Payout Channels:</strong> Approved earnings can be withdrawn to verified Pakistani financial channels including JazzCash, EasyPaisa, or direct Bank Accounts once reaching the minimum payout threshold (Rs. 1,000).</li>
+                <li><strong>Payout Channels:</strong> Commission is finalized after the order is delivered and the 7-day return period has passed. Approved payouts may be processed through JazzCash, EasyPaisa, or direct bank transfer.</li>
                 <li><strong>Forbidden Tactics:</strong> Cookie stuffing, spam messaging, posting fake promotional claims, self-referral through fraudulent accounts, or impersonating Pak-Tajarat staff will lead to immediate account termination and forfeiture of pending commissions.</li>
               </ul>
             </section>
