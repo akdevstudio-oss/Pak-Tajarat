@@ -74,7 +74,7 @@ export const PrivacyView: React.FC = () => {
             <section className="space-y-2 bg-gray-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
               <h3 className="text-base font-black text-gray-900 dark:text-white">3. Security & Safety (Data Security)</h3>
               <p>
-                Website ka application data MongoDB Atlas mein, jabke uploaded website aur product media Cloudflare R2 mein store hota hai. Website hosting aur API Vercel par chalti hain. In providers ko service chalane ke liye zaroori data process karna par sakta hai. Hum access controls istemal karte hain, lekin koi bhi online service absolute security ki guarantee nahi de sakti.
+                Website ka application data MongoDB Atlas mein, jabke uploaded website aur product media Cloudflare R2 mein store hota hai. Website hosting aur API Vercel par chalti hain. Google Analytics aur Microsoft Clarity site usage aur performance samajhne ke liye interaction/analytics data process kar sakte hain. In providers ko service chalane ke liye zaroori data process karna par sakta hai. Hum access controls istemal karte hain, lekin koi bhi online service absolute security ki guarantee nahi de sakti.
               </p>
             </section>
           </>
@@ -97,7 +97,7 @@ export const PrivacyView: React.FC = () => {
             <section className="space-y-2 bg-gray-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
               <h3 className="text-base font-black text-gray-900 dark:text-white">3. Cloud Security & Encryption</h3>
               <p>
-                Application data is handled through MongoDB Atlas, uploaded website and product media through Cloudflare R2, and website hosting and API delivery through Vercel. These providers may process the information needed to operate the store. Access controls are used and service credentials are kept server-side, but no online service can guarantee absolute security.
+                Application data is handled through MongoDB Atlas, uploaded website and product media through Cloudflare R2, and website hosting and API delivery through Vercel. Google Analytics and Microsoft Clarity may also process site-usage and interaction data to help measure performance and improve the experience. These providers may process the information needed to operate the store. Access controls are used and service credentials are kept server-side, but no online service can guarantee absolute security.
               </p>
             </section>
           </>
