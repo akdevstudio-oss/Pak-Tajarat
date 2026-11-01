@@ -61,7 +61,11 @@ export const HomeView: React.FC = () => {
         gradient: banner.gradient || 'from-emerald-800 to-teal-950',
         image: banner.image || banner.imageUrl || banner.mobileImage || '',
         mobileImage: banner.mobileImage || '',
-        badge: banner.badge || banner.badgeText || 'PAK-TIJARAT'
+        badge: banner.badge || banner.badgeText || 'PAK-TIJARAT',
+        ctaText: banner.ctaText || 'Explore Products',
+        ctaLink: banner.ctaLink || '/products',
+        secondaryCtaText: banner.secondaryCtaText || 'Our Story',
+        secondaryCtaLink: banner.secondaryCtaLink || '/about'
       }))
     : activeProducts.length > 0
       ? [{
@@ -71,7 +75,11 @@ export const HomeView: React.FC = () => {
           description: "Made in Pakistan for work, study, and travel.",
           gradient: "from-emerald-800 to-teal-950",
           image: activeProducts[0].image,
-          badge: "MADE FOR YOUR NEXT MOVE"
+          badge: "MADE FOR YOUR NEXT MOVE",
+          ctaText: "Explore Products",
+          ctaLink: "/products",
+          secondaryCtaText: "Our Story",
+          secondaryCtaLink: "/about"
         }]
       : [{
           id: isProductsLoading ? 'loading-catalog' : 'empty-catalog',
@@ -82,7 +90,11 @@ export const HomeView: React.FC = () => {
             : "Explore our marketplace and check back as new products are added.",
           gradient: "from-emerald-800 to-teal-950",
           image: "",
-          badge: isProductsLoading ? "LOADING STORE" : "WELCOME TO PAK-TIJARAT"
+          badge: isProductsLoading ? "LOADING STORE" : "WELCOME TO PAK-TIJARAT",
+          ctaText: "Explore Products",
+          ctaLink: "/products",
+          secondaryCtaText: "Our Story",
+          secondaryCtaLink: "/about"
         }];
 
   const [activeBanner, setActiveBanner] = useState(0);
@@ -115,7 +127,35 @@ export const HomeView: React.FC = () => {
     }
   };
 
-  // Static Reviews for Pak-Tajarat
+  const navigateBannerLink = (href?: string) => {
+    const target = (href || '/products').trim();
+    if (/^https?:\/\//i.test(target)) {
+      window.location.assign(target);
+      return;
+    }
+    const path = target.split('?')[0].replace(/\/+$/, '') || '/';
+    if (path.startsWith('/products/')) {
+      const productId = path.split('/')[2];
+      if (productId) {
+        viewProductDetails(decodeURIComponent(productId));
+        return;
+      }
+    }
+    switch (path) {
+      case '/': setCurrentView('home'); break;
+      case '/about': setCurrentView('about'); break;
+      case '/contact': setCurrentView('contact'); break;
+      case '/blog': setCurrentView('blog'); break;
+      case '/faq': setCurrentView('faq'); break;
+      case '/cart': setCurrentView('cart'); break;
+      case '/checkout': setCurrentView('checkout'); break;
+      case '/products':
+      case '/shop':
+      default: setCurrentView('products'); break;
+    }
+  };
+
+  // Reviews are shown only when real customer feedback has been collected.
   const customerReviews: { name: string; city: string; text: string; rating: number; avatar: string }[] = [];
 
   return (
@@ -166,17 +206,17 @@ export const HomeView: React.FC = () => {
 
               <div className="flex flex-wrap gap-4 pt-2">
                 <button
-                  onClick={() => setCurrentView('products')}
+                  onClick={() => navigateBannerLink(banners[activeBanner].ctaLink)}
                   className="bg-[#0F9D58] hover:bg-[#0B7B44] text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-900/30 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center space-x-2"
                 >
                   <ShoppingBag size={18} />
-                  <span>Explore Backpack</span>
+                  <span>{banners[activeBanner].ctaText}</span>
                 </button>
                 <button
-                  onClick={() => setCurrentView('about')}
+                  onClick={() => navigateBannerLink(banners[activeBanner].secondaryCtaLink)}
                   className="bg-white/15 hover:bg-white/25 text-white font-bold text-sm sm:text-base px-6 py-3.5 rounded-full transition-all duration-200 border border-white/20 flex items-center space-x-1"
                 >
-                  <span>Our Story</span>
+                  <span>{banners[activeBanner].secondaryCtaText}</span>
                   <ChevronRight size={16} />
                 </button>
               </div>
@@ -206,8 +246,8 @@ export const HomeView: React.FC = () => {
             <Truck size={22} />
           </div>
           <div>
-            <h4 className="font-bold text-gray-900 dark:text-white text-sm">Nationwide Cash on Delivery</h4>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Pay safely at your doorstep anywhere in Pak.</p>
+            <h4 className="font-bold text-gray-900 dark:text-white text-sm">Cash on Delivery</h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Available on eligible orders; check checkout.</p>
           </div>
         </div>
 
@@ -342,7 +382,7 @@ export const HomeView: React.FC = () => {
             Featured Products
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">
-            Premium-grade, handpicked products curated directly by the Pak-Tajarat vetting team.
+            Browse products currently listed in our store. Each listing shows its available details and current price.
           </p>
         </div>
 
@@ -361,17 +401,17 @@ export const HomeView: React.FC = () => {
               Limited Offer Code
             </span>
             <h3 className="text-xl sm:text-3xl font-black leading-tight">
-              Get Extra 20% Off Your First Order!
+              Explore the Latest Products
             </h3>
             <p className="text-xs sm:text-sm text-emerald-100/80 leading-relaxed">
-              Use checkout promo code <span className="font-mono bg-black/30 px-2 py-0.5 rounded text-yellow-300 font-extrabold tracking-widest">PAK20</span> on any orders above Rs. 3,000. Verified fast shipping, safe packaging guaranteed.
+              Browse the current catalogue for product details, stock availability, and any offers shown at checkout.
             </p>
           </div>
           <button
             onClick={() => setCurrentView('products')}
             className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg transform hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center space-x-1.5"
           >
-            <span>Activate Offer Now</span>
+            <span>Browse Products</span>
             <ArrowRight size={16} />
           </button>
         </div>
@@ -471,7 +511,7 @@ export const HomeView: React.FC = () => {
                 Latest Sourcing Guides & Insights
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xl">
-                Expert-written retail, wholesale, and logistics checklists to grow your trade business across Pakistan and rank higher on search engines.
+                Practical articles and product guides about shopping, product selection, and online retail in Pakistan.
               </p>
             </div>
             <button
