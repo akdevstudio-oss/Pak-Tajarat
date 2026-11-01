@@ -47,7 +47,7 @@ export const HomeView: React.FC = () => {
       const endTime = getBannerDateTime(banner.endDate, true);
       const started = startTime === null || startTime <= currentTime;
       const notExpired = endTime === null || endTime >= currentTime;
-      return enabled && started && notExpired && Boolean(banner.image || banner.imageUrl);
+      return enabled && started && notExpired && Boolean(banner.image || banner.imageUrl || banner.mobileImage);
     })
     .slice()
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -59,7 +59,8 @@ export const HomeView: React.FC = () => {
         subtitle: banner.subtitle || "Pakistan's Trusted Digital Marketplace",
         description: banner.description || 'Discover trusted products for work, study, and travel.',
         gradient: banner.gradient || 'from-emerald-800 to-teal-950',
-        image: banner.image || banner.imageUrl || '',
+        image: banner.image || banner.imageUrl || banner.mobileImage || '',
+        mobileImage: banner.mobileImage || '',
         badge: banner.badge || banner.badgeText || 'PAK-TIJARAT'
       }))
     : activeProducts.length > 0
@@ -133,7 +134,12 @@ export const HomeView: React.FC = () => {
             {banners[activeBanner].image && (
               <div className="order-first lg:order-last lg:col-span-5 relative w-full max-w-sm mx-auto lg:max-w-none">
                 <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 transform lg:rotate-1 lg:hover:rotate-0 transition-transform duration-500">
-                  <img src={banners[activeBanner].image} alt={banners[activeBanner].title} className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" referrerPolicy="no-referrer" />
+                  <picture className="block w-full h-full">
+                    {banners[activeBanner].mobileImage && (
+                      <source media="(max-width: 639px)" srcSet={banners[activeBanner].mobileImage} />
+                    )}
+                    <img src={banners[activeBanner].image} alt={banners[activeBanner].title} className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" referrerPolicy="no-referrer" />
+                  </picture>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
               </div>
@@ -210,8 +216,8 @@ export const HomeView: React.FC = () => {
             <ShieldCheck size={22} />
           </div>
           <div>
-            <h4 className="font-bold text-gray-900 dark:text-white text-sm">Verified Product Warranty</h4>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Shop 100% genuine checked imports.</p>
+            <h4 className="font-bold text-gray-900 dark:text-white text-sm">7-Day Return Requests</h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Contact support within 7 days and share your reason.</p>
           </div>
         </div>
 
@@ -220,8 +226,8 @@ export const HomeView: React.FC = () => {
             <TrendingUp size={22} />
           </div>
           <div>
-            <h4 className="font-bold text-gray-900 dark:text-white text-sm">Unmatched Price-Value</h4>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Direct partnership with local craftsmen.</p>
+            <h4 className="font-bold text-gray-900 dark:text-white text-sm">Clear Product Information</h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Review current photos, specifications and price before ordering.</p>
           </div>
         </div>
       </section>
