@@ -5,7 +5,7 @@ Pak-Tijarat is a Pakistan-focused e-commerce marketplace with a responsive store
 
 **Designed and developed by AK Dev Studio.**
 
-Website: https://www.pak-tajarat.store
+Website: https://pak-tajarat.store
 
 ## Technology
 - React, TypeScript, Vite, Tailwind CSS
