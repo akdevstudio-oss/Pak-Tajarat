@@ -60,6 +60,8 @@ export const HomeView: React.FC = () => {
         description: banner.description || 'Discover trusted products for work, study, and travel.',
         gradient: banner.gradient || 'from-emerald-800 to-teal-950',
         image: banner.image || banner.imageUrl || '',
+        mobileImage: banner.mobileImage || banner.image || banner.imageUrl || '',
+        imageAlt: banner.imageAlt || banner.imageTitle || banner.title || 'Pak-Tijarat promotional banner',
         badge: banner.badge || banner.badgeText || 'PAK-TIJARAT'
       }))
     : activeProducts.length > 0
@@ -70,6 +72,8 @@ export const HomeView: React.FC = () => {
           description: "Made in Pakistan for work, study, and travel.",
           gradient: "from-emerald-800 to-teal-950",
           image: activeProducts[0].image,
+          mobileImage: activeProducts[0].image,
+          imageAlt: activeProducts[0].name || 'Pak-Tijarat featured product',
           badge: "MADE FOR YOUR NEXT MOVE"
         }]
       : [{
@@ -81,6 +85,8 @@ export const HomeView: React.FC = () => {
             : "Explore our marketplace and check back as new products are added.",
           gradient: "from-emerald-800 to-teal-950",
           image: "",
+          mobileImage: "",
+          imageAlt: "Pak-Tijarat marketplace",
           badge: isProductsLoading ? "LOADING STORE" : "WELCOME TO PAK-TIJARAT"
         }];
 
@@ -122,7 +128,7 @@ export const HomeView: React.FC = () => {
       
       {/* 1. Hero Carousel Banner Section */}
       <section className="relative w-full overflow-hidden" id="hero-slider">
-        <div className={`w-full bg-gradient-to-r ${banners[activeBanner].gradient} text-white rounded-3xl md:rounded-[40px] shadow-xl overflow-hidden min-h-[460px] md:min-h-[520px] flex items-center relative`}>
+        <div className={`w-full bg-gradient-to-r ${banners[Math.min(activeBanner, banners.length - 1)].gradient} text-white rounded-3xl md:rounded-[40px] shadow-xl overflow-hidden min-h-[460px] md:min-h-[520px] flex items-center relative`}>
           
           {/* Background pattern */}
           <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
@@ -130,10 +136,13 @@ export const HomeView: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-8 md:p-16 relative z-10 w-full items-center">
             
             {/* Product image is visible on mobile and desktop when available */}
-            {banners[activeBanner].image && (
+            {banners[Math.min(activeBanner, banners.length - 1)].image && (
               <div className="order-first lg:order-last lg:col-span-5 relative w-full max-w-sm mx-auto lg:max-w-none">
                 <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 transform lg:rotate-1 lg:hover:rotate-0 transition-transform duration-500">
-                  <img src={banners[activeBanner].image} alt={banners[activeBanner].title} className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" referrerPolicy="no-referrer" />
+                  <picture className="block w-full h-full">
+                    <source media="(max-width: 767px)" srcSet={banners[Math.min(activeBanner, banners.length - 1)].mobileImage || banners[Math.min(activeBanner, banners.length - 1)].image} />
+                    <img src={banners[Math.min(activeBanner, banners.length - 1)].image} alt={banners[Math.min(activeBanner, banners.length - 1)].imageAlt || banners[Math.min(activeBanner, banners.length - 1)].title} className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" referrerPolicy="no-referrer" />
+                  </picture>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
               </div>
@@ -143,19 +152,19 @@ export const HomeView: React.FC = () => {
             <div className="lg:col-span-7 space-y-6 text-left">
               <span className="inline-flex items-center space-x-1 bg-emerald-950/45 text-emerald-300 text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-emerald-500/25">
                 <Sparkles size={12} className="text-emerald-400" />
-                <span>{banners[activeBanner].badge}</span>
+                <span>{banners[Math.min(activeBanner, banners.length - 1)].badge}</span>
               </span>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-white animate-in slide-in-from-bottom duration-300">
-                {banners[activeBanner].title}
+                {banners[Math.min(activeBanner, banners.length - 1)].title}
               </h1>
 
               <p className="text-lg md:text-xl font-bold text-emerald-100/90 leading-normal">
-                {banners[activeBanner].subtitle}
+                {banners[Math.min(activeBanner, banners.length - 1)].subtitle}
               </p>
 
               <p className="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-xl">
-                {banners[activeBanner].description}
+                {banners[Math.min(activeBanner, banners.length - 1)].description}
               </p>
 
               <div className="flex flex-wrap gap-4 pt-2">
