@@ -1,52 +1,75 @@
-# robots.txt for Pak-Tajarat
-# Public storefront and product pages may be crawled.
+# Public search access for Pak-Tijarat
 User-agent: *
 Allow: /
-Disallow: /pkadmin
+Disallow: /api/
 Disallow: /admin
+Disallow: /admin/
 Disallow: /admin-login
 Disallow: /admin-dashboard
+Disallow: /pkadmin
+Disallow: /pkadmin/
 Disallow: /profile
 Disallow: /my-account
 Disallow: /checkout
 Disallow: /cart
 Disallow: /affiliate-portal
+Disallow: /auth
+Disallow: /login
+Disallow: /signup
 
-# AI crawlers may access public storefront content, not private/admin areas.
+# Public product and editorial pages may be crawled by search and answer engines.
 User-agent: GPTBot
 Allow: /
-Disallow: /pkadmin
+Disallow: /api/
 Disallow: /admin
+Disallow: /admin/
 Disallow: /admin-login
 Disallow: /admin-dashboard
+Disallow: /pkadmin
+Disallow: /pkadmin/
 Disallow: /profile
 Disallow: /my-account
 Disallow: /checkout
 Disallow: /cart
 Disallow: /affiliate-portal
+Disallow: /auth
+Disallow: /login
+Disallow: /signup
 
 User-agent: ChatGPT-User
 Allow: /
-Disallow: /pkadmin
+Disallow: /api/
 Disallow: /admin
+Disallow: /admin/
 Disallow: /admin-login
 Disallow: /admin-dashboard
+Disallow: /pkadmin
+Disallow: /pkadmin/
 Disallow: /profile
 Disallow: /my-account
 Disallow: /checkout
 Disallow: /cart
 Disallow: /affiliate-portal
+Disallow: /auth
+Disallow: /login
+Disallow: /signup
 
 User-agent: Google-Extended
 Allow: /
-Disallow: /pkadmin
+Disallow: /api/
 Disallow: /admin
+Disallow: /admin/
 Disallow: /admin-login
 Disallow: /admin-dashboard
+Disallow: /pkadmin
+Disallow: /pkadmin/
 Disallow: /profile
 Disallow: /my-account
 Disallow: /checkout
 Disallow: /cart
 Disallow: /affiliate-portal
+Disallow: /auth
+Disallow: /login
+Disallow: /signup
 
 Sitemap: https://pak-tajarat.store/sitemap.xml

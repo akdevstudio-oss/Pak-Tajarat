@@ -25,13 +25,13 @@ export default async function handler(req: Request, res: ServerResponse) {
   let reply = "";
 
   if (/delivery|deliver|shipping|tcs|leopard|kitny din|kitne din|kab tak|pohanch/.test(q)) {
-    reply = "Website par delivery estimate 2–4 business days diya gaya hai. Remote areas aur courier conditions ki wajah se time vary kar sakta hai. Order confirm karne se pehle WhatsApp support se apne area ka estimate confirm kar lein.";
+    reply = "Orders TCS, Leopard ya kisi available courier partner ke zariye dispatch kiye ja sakte hain. Delivery time aur charges destination aur courier par depend karte hain. Apne area ka estimate checkout ya WhatsApp support par confirm karein."
   } else if (/cash on delivery|\bcod\b|pay on delivery|darwaz|cash/.test(q)) {
     reply = "Ji, website par Cash on Delivery (COD) listed hai. Order place karte waqt checkout par available payment option select karein. Agar option show na ho to WhatsApp support se confirm karein.";
   } else if (/return|refund|wapas|replace|exchange/.test(q)) {
-    reply = "Website ki listed policy 7-day returns hai. Return ki eligibility product condition aur policy terms par depend karti hai. Request se pehle support se reason aur process confirm karein.";
+    reply = "Return request delivery ke 7 din ke andar WhatsApp (+92 326 1604808) par bhejein aur order number ke saath return ki wajah batayein. Support team eligibility aur return instructions confirm karegi; instructions se pehle parcel wapas na bhejein."
   } else if (/payment|jazzcash|easypaisa|bank transfer|card/.test(q)) {
-    reply = "Website par COD, JazzCash, Easypaisa aur bank transfer options listed hain. Checkout par jo options actually available hon, unhi ko use karein; card payment ki availability assume na karein.";
+    reply = "Checkout par jo payment option available show ho, wahi use karein. Cash on Delivery eligible orders ke liye available hai. JazzCash, Easypaisa aur bank transfer affiliate payouts ke liye ho sakte hain; inhein checkout payment options na samjhein jab tak checkout par show na hon."
   } else if (/contact|whatsapp|phone|number|email|support|rabta/.test(q)) {
     reply = "Pak-Tijarat support: WhatsApp +92 326 1604808. Aap wa.me/923261604808 par message kar sakte hain. Email: alikhanxada1001@gmail.com.";
   } else if (/product|products|price|bag|backpack|stock|available|popular|hot|discount|catalog|catalogue|qeemat|rate|item/.test(q)) {
