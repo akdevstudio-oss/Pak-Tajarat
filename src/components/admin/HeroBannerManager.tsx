@@ -120,7 +120,7 @@ export const HeroBannerManager: React.FC = () => {
   const handleDesktopImageUpload = async (file: File) => {
     try {
       setUploadingDesktop(true);
-      const res = await optimizeAndUploadImage(file, 'banners/desktop', 1600, 0.85);
+      const res = await optimizeAndUploadImage(file, 'banners', 1600, 0.85);
       setForm(prev => ({ ...prev, image: res.url }));
       addNotification('Desktop Image Uploaded', 'Desktop banner image optimized and attached.', 'success');
     } catch (err) {
@@ -134,7 +134,7 @@ export const HeroBannerManager: React.FC = () => {
   const handleMobileImageUpload = async (file: File) => {
     try {
       setUploadingMobile(true);
-      const res = await optimizeAndUploadImage(file, 'banners/mobile', 800, 0.85);
+      const res = await optimizeAndUploadImage(file, 'banners', 800, 0.85);
       setForm(prev => ({ ...prev, mobileImage: res.url }));
       addNotification('Mobile Image Uploaded', 'Mobile banner image optimized and attached.', 'success');
     } catch (err) {
