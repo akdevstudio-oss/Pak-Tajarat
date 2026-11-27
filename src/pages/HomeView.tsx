@@ -57,7 +57,7 @@ export const HomeView: React.FC = () => {
         id: banner.id,
         title: banner.title || 'Pak-Tijarat',
         subtitle: banner.subtitle || "Pakistan's Trusted Digital Marketplace",
-        description: banner.description || 'Discover trusted products for work, study, and travel.',
+        description: banner.description || 'Explore fashion, accessories, electronics, beauty, home essentials and more.',
         gradient: banner.gradient || 'from-emerald-800 to-teal-950',
         image: banner.image || banner.imageUrl || '',
         badge: banner.badge || banner.badgeText || 'PAK-TIJARAT'
@@ -65,12 +65,12 @@ export const HomeView: React.FC = () => {
     : activeProducts.length > 0
       ? [{
           id: 'real-product',
-          title: "Carry Confidence. Go Further.",
-          subtitle: "One backpack. Every journey.",
-          description: "Made in Pakistan for work, study, and travel.",
+          title: "Everything You Love, All in One Place.",
+          subtitle: "Discover more. Shop smarter with Pak-Tijarat.",
+          description: "Explore fashion, accessories, electronics, beauty and everyday essentials in one trusted marketplace.",
           gradient: "from-emerald-800 to-teal-950",
-          image: activeProducts[0].image,
-          badge: "MADE FOR YOUR NEXT MOVE"
+          image: "",
+          badge: "WELCOME TO PAK-TIJARAT"
         }]
       : [{
           id: isProductsLoading ? 'loading-catalog' : 'empty-catalog',
@@ -94,7 +94,7 @@ export const HomeView: React.FC = () => {
     if (banners.length <= 1) return;
     const interval = setInterval(() => {
       setActiveBanner((prev) => (prev + 1) % banners.length);
-    }, 5000);
+    }, 4000);
     return () => clearInterval(interval);
   }, [banners.length]);
 
@@ -164,7 +164,7 @@ export const HomeView: React.FC = () => {
                   className="bg-[#0F9D58] hover:bg-[#0B7B44] text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-900/30 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center space-x-2"
                 >
                   <ShoppingBag size={18} />
-                  <span>Explore Backpack</span>
+                  <span>Explore Marketplace</span>
                 </button>
                 <button
                   onClick={() => setCurrentView('about')}
